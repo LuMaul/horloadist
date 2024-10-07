@@ -1,18 +1,8 @@
 # Calculate Load Distribution In The Plane
 
+> Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
+
 This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Currently, it only works with constant stiffness values.
-
-## Prerequisites
-
-- Python 3.x
-- `horloadist` library
-
-## Installation
-
-Clone this repository:
-```
-git clone https://github.com/LuMaul/hor_load_dist.git
-```
 
 ## Example Output
 
@@ -47,6 +37,20 @@ tor. Ts   : -2.5000
 5        6       0.0  0.333333  -0.000000   0.020221  0.000000  0.353554
 6        7       0.0  0.333333  -0.000000   0.040441  0.000000  0.373775
 ```
+
+
+## Prerequisites
+
+- Python 3.x
+- `horloadist` library
+
+## Installation
+
+Clone this repository:
+```
+git clone https://github.com/LuMaul/hor_load_dist.git
+```
+
 
 ## Usage
 
@@ -95,7 +99,7 @@ sol.printTable()
 
 ## Caution
 
-> Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
+
 
 
 ## Contributing
