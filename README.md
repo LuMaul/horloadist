@@ -1,6 +1,6 @@
-# Structural Analysis Tool for Load Distribution In The Plane
+# Calculate Load Distribution In The Plane
 
-This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D-polygon in x-y space representing a plate and some supports with their bending stiffnesses around the x and y axes.
+This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports and their bending stiffnesses around the x and y axes. Currently, it only works with constant stiffness values.
 
 ## Prerequisites
 
