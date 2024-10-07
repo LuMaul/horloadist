@@ -9,10 +9,10 @@ This project provides a tool for structural analysis using the `horloadist` libr
 
 ## Installation
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/LuMaul/hor_load_dist.git
-   ```
+Clone this repository:
+```
+git clone https://github.com/LuMaul/hor_load_dist.git
+```
 
 ## Example Output
 
@@ -95,11 +95,8 @@ sol.printTable()
 
 ## Caution
 
-As noted in the code comments:
-
 > Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
-It's important to verify the results and ensure they make sense for your specific use case.
 
 ## Contributing
 
