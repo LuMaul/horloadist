@@ -11,7 +11,7 @@ This project provides a tool for structural analysis using the `horloadist` libr
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/structural-analysis-tool.git
+   git clone https://github.com/LuMaul/hor_load_dist.git
    ```
 
 ## Usage
