@@ -42,6 +42,8 @@ tor. Ts   : -2.5000
 ## Prerequisites
 
 - Python 3.x
+- pandas
+- numpy
 - `horloadist` library
 
 ## Installation
