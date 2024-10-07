@@ -4,11 +4,78 @@ from .polygon import Polygon
 from .node import SupportNode
 
 class Stucture:
+    """
+    A class to represent a structural system defined by a polygon and a list of support nodes.
+
+    Parameters
+    ----------
+    polygon : Polygon
+        The polygon that defines the structural geometry.
+    nodes : list of SupportNode
+        A list of support nodes associated with the structure.
+    
+    Attributes
+    ----------
+    _polygon : Polygon
+        The polygon object representing the structural geometry.
+    _nodes : list of SupportNode
+        List of support nodes forming the structure.
+    _node_numbers : pd.Series
+        Series representing the node numbers of the structure.
+    _node_x : pd.Series
+        Series representing the x-coordinates of the nodes.
+    _node_y : pd.Series
+        Series representing the y-coordinates of the nodes.
+    _node_EIy : pd.Series
+        Series representing the flexural stiffness of nodes along the y-axis.
+    _node_EIx : pd.Series
+        Series representing the flexural stiffness of nodes along the x-axis.
+    _node_diff_x_xm : pd.Series
+        Series representing the difference between node x-coordinates and the
+        polygon centroid x-coordinate.
+    _node_diff_y_ym : pd.Series
+        Series representing the difference between node y-coordinates and the
+        polygon centroid y-coordinate.
+    _stiff_centre_x : float
+        The x-coordinate of the stiffness center of the structure.
+    _stiff_centre_y : float
+        The y-coordinate of the stiffness center of the structure.
+    _node_diff_xs_xm : pd.Series
+        Series representing the difference between the stiffness center
+        x-coordinate and node x-coordinates.
+    _node_diff_ys_ym : pd.Series
+        Series representing the difference between the stiffness center
+        y-coordinate and node y-coordinates.
+    _node_EIx_proportion : pd.Series
+        Series representing the proportion of the total flexural stiffness
+        along the x-axis for each node.
+    _node_EIy_proportion : pd.Series
+        Series representing the proportion of the total flexural stiffness
+        along the y-axis for each node.
+    _global_EIw : pd.Series
+        Series representing the global warping stiffness.
+    _node_EIwx_proportion : pd.Series
+        Series representing the proportion of the torsional stiffness
+        contribution for each node along the x-axis.
+    _node_EIwy_proportion : pd.Series
+        Series representing the proportion of the torsional stiffness
+        contribution for each node along the y-axis.
+    _result_table : pd.DataFrame
+        DataFrame containing various structural properties and node data.
+    """  
     def __init__(self, polygon:Polygon, nodes:list[SupportNode]):
-        
+        """
+        Initializes the Stucture class with the provided polygon and support nodes.
+
+        Parameters
+        ----------
+        polygon : Polygon
+            The polygon object representing the structure's geometry.
+        nodes : list of SupportNode
+            List of nodes representing the structure's support points.
+        """       
         self._polygon = polygon
         self._nodes = nodes
-
     
     @property
     def _node_numbers(self) -> pd.Series:
@@ -105,6 +172,18 @@ class Stucture:
 
 
     def printTable(self) -> None:
+        """
+        Prints a detailed summary of the structure's geometric and stiffness properties.
+
+        This method outputs the polygon area, centroid, stiffness center, total stiffness 
+        in x and y directions, as well as the global warping stiffness. It also prints 
+        a table with node-specific data such as coordinates, stiffness proportions, 
+        and torsional stiffness contributions.
+
+        Returns
+        -------
+        None
+        """
         print(
             "\n"
             f"polyg. area           : "

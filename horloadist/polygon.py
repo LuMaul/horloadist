@@ -1,7 +1,40 @@
 import numpy as np
 
 class Polygon:
+    """
+    A class to represent a polygon and compute its geometric properties such as
+    area and centroid.
+
+    Parameters
+    ----------
+    glob_xy : list of tuple of float
+        A list of 2D points (x, y coordinates) that define the vertices of
+        the polygon.
+    
+    Attributes
+    ----------
+    _xy : list of tuple of float
+        List of x and y coordinates representing the vertices of the polygon.
+    _xy_closed_polygon : np.ndarray
+        A closed polygon by appending the first point to the end.
+    _triangle_areas : np.ndarray
+        Areas of the triangles formed between consecutive polygon vertices.
+    _triangle_centroids : np.ndarray
+        Centroids of the triangles formed between consecutive polygon vertices.
+    area : np.float64
+        The total area of the polygon.
+    centroid : np.ndarray
+        The centroid (geometric center) of the polygon.
+    """
     def __init__(self, glob_xy:list[float,float]):
+        """
+        Initializes the Polygon with the given 2D points.
+
+        Parameters
+        ----------
+        glob_xy : list of tuple of float
+            List of (x, y) coordinates defining the vertices of the polygon.
+        """
         self._xy = glob_xy
 
     @property
