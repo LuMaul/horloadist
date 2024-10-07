@@ -1,0 +1,5 @@
+__pycache__
+stiffness_data
+exract_node_stiffness.py
+horloadist/nonlinsolve.py
+THESIS_main.py
