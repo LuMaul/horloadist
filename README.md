@@ -85,15 +85,15 @@ The provided example creates a plate structure with seven support nodes and solv
 
 ```python
 # Create support nodes
-w1 = SupportNode(1, -10.0, -2.5, globalIx(5, 0.3), globalIy(5, 0.3))
+w1 = SupportNode(1, -10.0,  2.5, globalIx(5, 0.3), globalIy(5, 0.3))
 # ... (other nodes)
 
 # Define the plate
-plate = Polygon([[-12.5, -7.5], [-12.5, 7.5], [12.5, 7.5], [12.5, -7.5]])
+plate = Polygon([[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
 
 # Create and solve the structure
 struc = Stucture(plate, [w1, w2, w3, w4, w5, w6, w7])
-sol = LinSolve(struc, 0, 1)
+sol = LinSolve(struc, 0, -1)
 
 # Print results
 struc.printTable()
