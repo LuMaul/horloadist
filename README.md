@@ -49,9 +49,9 @@ tor. Ts   : 2.4672
 
 ## Installation
 
-Clone this repository:
+install via pip:
 ```
-git clone https://github.com/LuMaul/hor_load_dist.git
+pip install horloadist==1.0.0
 ```
 
 
