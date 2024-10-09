@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Polygon:
     """
     A class to represent a polygon and compute its geometric properties such as
@@ -26,7 +27,7 @@ class Polygon:
     centroid : np.ndarray
         The centroid (geometric center) of the polygon.
     """
-    def __init__(self, glob_xy:list[float,float]):
+    def __init__(self, glob_xy:list[list[float|int]]):
         """
         Initializes the Polygon with the given 2D points.
 

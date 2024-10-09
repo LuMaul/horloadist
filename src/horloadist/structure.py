@@ -1,7 +1,9 @@
 import pandas as pd
 
 from .polygon import Polygon
+from .stiffnesses import KX, KY
 from .node import SupportNode
+from .utils import interpolateXY
 
 class Stucture:
     """
@@ -63,7 +65,7 @@ class Stucture:
     _result_table : pd.DataFrame
         DataFrame containing various structural properties and node data.
     """  
-    def __init__(self, polygon:Polygon, nodes:list[SupportNode]):
+    def __init__(self, polygon:Polygon, nodes:list[SupportNode], verbose:bool=True):
         """
         Initializes the Stucture class with the provided polygon and support nodes.
 
@@ -75,27 +77,53 @@ class Stucture:
             List of nodes representing the structure's support points.
         """       
         self._polygon = polygon
-        self._nodes = nodes
+        self._verbose = verbose
+        self._allnodes = nodes
+        self._linnodes = self._to_linear_nodes(nodes)
+
+
+    def _to_linear_nodes(self, nodes:list[SupportNode]) -> list[SupportNode]:
+
+        MOMENTUM = 0
+
+        def printInfo(nr:int, axis:str, EI:float) -> None:
+            if self._verbose:
+                print(
+                    f"Info: node {nr} -> took EI{axis}(Mom={MOMENTUM}) "
+                    f"= {EI:,.1f} for linear solving"
+                    )
+
+        def extractStiffnessAtMomentZero(node:SupportNode) -> SupportNode:
+            if isinstance(node._glob_EIx, pd.DataFrame):
+                node._glob_EIx = interpolateXY(node._glob_EIx, MOMENTUM)
+                printInfo(node._nr, 'x', node._glob_EIx)
+            if isinstance(node._glob_EIy, pd.DataFrame):
+                node._glob_EIy = interpolateXY(node._glob_EIy, MOMENTUM)
+                printInfo(node._nr, 'y', node._glob_EIy)
+            return node
+        
+        return [extractStiffnessAtMomentZero(node) for node in nodes]
+
     
     @property
     def _node_numbers(self) -> pd.Series:
-        return pd.Series([node._nr for node in self._nodes])
+        return pd.Series([node._nr for node in self._linnodes])
     
     @property
     def _node_x(self) -> pd.Series:
-        return pd.Series([node._glob_x for node in self._nodes])
+        return pd.Series([node._glob_x for node in self._linnodes])
 
     @property
     def _node_y(self) -> pd.Series:
-        return pd.Series([node._glob_y for node in self._nodes])
+        return pd.Series([node._glob_y for node in self._linnodes])
     
     @property
     def _node_EIy(self) -> pd.Series:
-        return pd.Series([node._glob_EIy for node in self._nodes])
+        return pd.Series([node._glob_EIy for node in self._linnodes])
     
     @property
     def _node_EIx(self) -> pd.Series:
-        return pd.Series([node._glob_EIx for node in self._nodes])
+        return pd.Series([node._glob_EIx for node in self._linnodes])
     
     @property
     def _node_diff_x_xm(self) -> pd.Series:

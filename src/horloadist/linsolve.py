@@ -3,6 +3,7 @@ import pandas as pd
 from .node import SupportNode
 from .structure import Stucture
 
+
 class LinSolve:
     """
     A class to represent the linear solver for a structure subjected to forces 
@@ -62,6 +63,7 @@ class LinSolve:
         self._structure = structure
         self._x_force = x_mass_force
         self._y_force = y_mass_force
+
 
     @property
     def _torsion_Ts_from_x(self) -> float:
@@ -156,6 +158,6 @@ class LinSolve:
             ry = self._table['Vy'].loc[self._table['node nr'] == node._nr]
             return float(ry.iloc[0])
 
-        for node in self._structure._nodes:
+        for node in self._structure._linnodes:
             node._Rx = -extracVxByNode(node)
             node._Ry = -extracVyByNode(node)
