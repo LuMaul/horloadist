@@ -145,16 +145,16 @@ setup(
     # },
     # If there are data files included in your packages that need to be
     # installed, specify them here.
-    package_data={  # Optional
-        "sample": ["package_data.dat"],
-    },
+    # package_data={  # Optional
+    #     "sample": ["package_data.dat"],
+    # },
     # Entry points. The following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
-    entry_points={  # Optional
-        "console_scripts": [
-            "sample=sample:main",
-        ],
-    },
+    # entry_points={  # Optional
+    #     "console_scripts": [
+    #         "sample=sample:main",
+    #     ],
+    # },
     # List additional URLs that are relevant to your project as a dict.
     #
     # This field corresponds to the "Project-URL" metadata fields:
