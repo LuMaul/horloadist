@@ -51,7 +51,7 @@ tor. Ts   : 2.4672
 
 install via pip:
 ```
-pip install horloadist==1.0.0
+pip install horloadist==1.0.2
 ```
 
 
