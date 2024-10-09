@@ -143,11 +143,11 @@ class Stucture:
     
     @property
     def _node_EIwx_proportion(self) -> pd.Series:
-        return self._node_EIy * self._node_diff_ys_ym / self._global_EIw
+        return  self._node_EIy * self._node_diff_ys_ym / self._global_EIw
     
     @property
     def _node_EIwy_proportion(self) -> pd.Series:
-        return self._node_EIx * self._node_diff_xs_xm / self._global_EIw
+        return -self._node_EIx * self._node_diff_xs_xm / self._global_EIw
     
     @property
     def _result_table(self) -> pd.DataFrame:
@@ -160,8 +160,8 @@ class Stucture:
             'y-ym':self._node_diff_y_ym,
             'xm-xs ':self._node_diff_xs_xm,
             'ym-ys':self._node_diff_ys_ym,
-            'EIy':self._node_EIy,
             'EIx':self._node_EIx,
+            'EIy':self._node_EIy,
             '% EIx':self._node_EIx_proportion,
             '% EIy':self._node_EIy_proportion,
             '% EIwx':self._node_EIwx_proportion,

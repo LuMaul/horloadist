@@ -84,11 +84,11 @@ class LinSolve:
     
     @property
     def _node_Vx_from_EIwx(self) -> pd.Series:
-        return self._structure._node_EIwx_proportion * self._torsion_Ts
+        return -self._structure._node_EIwx_proportion * self._torsion_Ts
     
     @property
     def _node_Vy_from_EIwy(self) -> pd.Series:
-        return self._structure._node_EIwy_proportion * self._torsion_Ts
+        return  self._structure._node_EIwy_proportion * self._torsion_Ts
     
     @property
     def _node_final_Vx(self) -> pd.Series:
