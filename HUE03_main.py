@@ -1,4 +1,4 @@
-from horloadist import SupportNode, Polygon, Stucture, LinSolve
+from src import SupportNode, Polygon, Stucture, LinSolve
 
 # Caution! Do not blindly trust this calculation, but always check
 # the plausibility of the results.

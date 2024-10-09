@@ -1,4 +1,4 @@
-from horloadist import SupportNode, Polygon, Stucture, LinSolve
+from src import SupportNode, Polygon, Stucture, LinSolve
 
 def globalIy(dx, dy):
     return dy*dx**3/12
