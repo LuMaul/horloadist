@@ -2,7 +2,7 @@
 
 > Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
-This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Currently, it only works with constant stiffness values.
+This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Use `NonLinSolve` for solving systems with nonlinear wall bending stiffnesses taken from csv files. 
 
 ## Example Output
 
@@ -45,6 +45,7 @@ tor. Ts   : 2.4672
 - Python 3.x
 - pandas
 - numpy
+- matplotlib
 - `horloadist` library
 
 ## Installation

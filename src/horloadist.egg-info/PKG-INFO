@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: horloadist
-Version: 1.1.0
+Version: 1.1.1
 Summary: Calculates the horizontal load distribution on supports in the plane
 Author-email: "L.Maul" <saculluam@hotmail.com>
 Maintainer-email: "L.Maul" <saculluam@hotmail.com>
@@ -100,7 +100,7 @@ tor. Ts   : 2.4672
 
 install via pip:
 ```
-pip install horloadist==1.0.2
+pip install horloadist
 ```
 
 
