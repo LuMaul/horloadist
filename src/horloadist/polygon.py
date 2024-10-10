@@ -28,14 +28,6 @@ class Polygon:
         The centroid (geometric center) of the polygon.
     """
     def __init__(self, glob_xy:list[list[float|int]]):
-        """
-        Initializes the Polygon with the given 2D points.
-
-        Parameters
-        ----------
-        glob_xy : list of tuple of float
-            List of (x, y) coordinates defining the vertices of the polygon.
-        """
         self._xy = glob_xy
 
     @property

@@ -1,6 +1,7 @@
+import pandas as pd
+
 from .stiffnesses import KX, KY
 
-import pandas as pd
 
 class SupportNode:
     """
@@ -44,22 +45,6 @@ class SupportNode:
             glob_kx:float|pd.DataFrame,
             glob_ky:float|pd.DataFrame
             ):
-        """
-        Initializes the SupportNode with the given properties.
-
-        Parameters
-        ----------
-        nr : int
-            Node number (identifier).
-        glob_x : float
-            Global x-coordinate of the node.
-        glob_y : float
-            Global y-coordinate of the node.
-        glob_EIy : float
-            Global stiffness value along the y-axis (bending stiffness).
-        glob_EIx : float
-            Global stiffness value along the x-axis (bending stiffness).
-        """
         self._nr = nr
         self._glob_x = glob_x
         self._glob_y = glob_y
@@ -67,7 +52,7 @@ class SupportNode:
         self._glob_EIx = glob_kx
 
         # updated via Solvers
-        self._Rx = None
-        self._Ry = None
+        self._Rx = 0
+        self._Ry = 0
 
 

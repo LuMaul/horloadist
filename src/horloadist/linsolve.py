@@ -48,18 +48,6 @@ class LinSolve:
         DataFrame containing calculated nodal forces in both directions and torsional effects.
     """  
     def __init__(self, structure:Stucture, x_mass_force:float=1, y_mass_force:float=1):
-        """
-        Initializes the LinSolve class with the provided structure and forces.
-
-        Parameters
-        ----------
-        structure : Structure
-            The structure object containing information about the geometry and stiffness center.
-        x_mass_force : float, optional
-            The force acting along the x-axis (default is 1).
-        y_mass_force : float, optional
-            The force acting along the y-axis (default is 1).
-        """     
         self._structure = structure
         self._x_force = x_mass_force
         self._y_force = y_mass_force

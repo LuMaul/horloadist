@@ -1,4 +1,5 @@
 import pandas as pd
+from copy import deepcopy
 
 from .polygon import Polygon
 from .stiffnesses import KX, KY
@@ -66,20 +67,10 @@ class Stucture:
         DataFrame containing various structural properties and node data.
     """  
     def __init__(self, polygon:Polygon, nodes:list[SupportNode], verbose:bool=True):
-        """
-        Initializes the Stucture class with the provided polygon and support nodes.
-
-        Parameters
-        ----------
-        polygon : Polygon
-            The polygon object representing the structure's geometry.
-        nodes : list of SupportNode
-            List of nodes representing the structure's support points.
-        """       
         self._polygon = polygon
         self._verbose = verbose
-        self._allnodes = nodes
-        self._linnodes = self._to_linear_nodes(nodes)
+        self._nodes = nodes
+        self._linnodes = self._to_linear_nodes(deepcopy(nodes))
 
 
     def _to_linear_nodes(self, nodes:list[SupportNode]) -> list[SupportNode]:

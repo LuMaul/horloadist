@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: horloadist
-Version: 1.0.2
+Version: 1.1.0
 Summary: Calculates the horizontal load distribution on supports in the plane
 Author-email: "L.Maul" <saculluam@hotmail.com>
 Maintainer-email: "L.Maul" <saculluam@hotmail.com>
@@ -44,6 +44,8 @@ Description-Content-Type: text/markdown
 License-File: LICENSE.txt
 Requires-Dist: numpy
 Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: matplotlib
 
 # Calculate Load Distribution In The Plane
 
