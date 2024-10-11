@@ -1,10 +1,10 @@
 # `horloadist`
 
-Calculate planar **hor**izontal **load** **dist**ribution:
+Calculate **hor**izontal **load** **dist**ribution on multiple supports of a single shell assuming $EA \to \infty$ .
 
 > Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
-This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate or shell, along with supports that represent walls and their bending stiffnesses around the x and y axes. Afterwards you can calculate the horizontal reaction forces on the support nodes (walls). Use `NonLinSolve` for solving systems iteratively with nonlinear wall bending stiffnesses taken from user created csv files.
+This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a shell, along with supports that represent walls and their bending stiffnesses around the x and y axes. Afterwards you can calculate the horizontal reaction forces on the support nodes (walls). Use `NonLinSolve` for solving systems iteratively with nonlinear wall bending stiffnesses taken from user created csv files.
 
 ## Example Table Output of `LinSolve`
 
@@ -41,21 +41,21 @@ tor. Ts   : 2.4672
 6        7       0.0 -0.331345   0.000140  3.993476e-02 -0.000140 -0.291411
 ```
 
-## Example Plot of `NonLinSolve`
+## Example Output of `NonLinSolve`
 
-See example `NONLIN_main.py`in the examples directory.
+Output of `plot_nlsolve` from `NONLIN_main.py` in the examples directory:
 
 ![non linear example](example_nlsolve.png "non linear convergation process")
 
 
 ## Prerequisites
 
+- `horloadist` library
 - Python 3.x
 - pandas
 - numpy
 - matplotlib
 - datetime
-- `horloadist` library
 
 ## Installation
 
@@ -95,7 +95,7 @@ The provided example creates a plate structure with seven support nodes and solv
 
 ```python
 # Create support nodes
-w1 = SupportNode(1, -10.0,  2.5, globalIx(5, 0.3), globalIy(5, 0.3))
+w1 = SupportNode(1, -10.0,  2.5, globalIy(5, 0.3), globalIx(5, 0.3))
 # ... (other nodes)
 
 # Define the plate
@@ -103,14 +103,20 @@ plate = Polygon([[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
 
 # Create and solve the structure
 struc = Stucture(plate, [w1, w2, w3, w4, w5, w6, w7])
-sol = LinSolve(struc, 0, -1)
+sol = LinSolve(struc, 0, 1)
 
 # Print results
 struc.printTable()
 sol.printTable()
 ```
 
+
+## Possible Further Improvements
+
+- add plot for geometry and force-vectors
+- add $EI$-$M$ plot for bending stiffnesses imported from csv files
+- add angle param for `KX.globalRectangular(... , angle_from_x : float = ...)`
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. 
-If you'd like to add a graphical output of the geometry, feel free.
