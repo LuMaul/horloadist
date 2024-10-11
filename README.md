@@ -50,6 +50,7 @@ tor. Ts   : 2.4672
 - pandas
 - numpy
 - matplotlib
+- datetime
 - `horloadist` library
 
 ## Installation
