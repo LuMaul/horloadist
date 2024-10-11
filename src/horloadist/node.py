@@ -48,8 +48,8 @@ class SupportNode:
         self._nr = nr
         self._glob_x = glob_x
         self._glob_y = glob_y
-        self._glob_EIy = glob_ky
-        self._glob_EIx = glob_kx
+        self._glob_EIy = glob_kx
+        self._glob_EIx = glob_ky
 
         # updated via Solvers
         self._Rx = 0.0
