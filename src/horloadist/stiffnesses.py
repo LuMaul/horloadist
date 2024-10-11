@@ -8,7 +8,7 @@ class KX:
 
     @staticmethod
     def constRectangular(dx_glob:float, dy_glob:float) -> float:
-        return dy_glob * dx_glob**3 / 12
+        return dy_glob * dx_glob**3 / 12 #EIy
     
     @staticmethod
     def from_csv(csv_path:str, momYColName:str, EIYColName:str) -> pd.DataFrame:
@@ -24,7 +24,7 @@ class KY:
 
     @staticmethod
     def constRectangular(dx_glob:float, dy_glob:float) -> float:
-        return dx_glob * dy_glob**3 / 12
+        return dx_glob * dy_glob**3 / 12 #EIx
     
     @staticmethod
     def from_csv(csv_path:str, momXColName:str, EIXColName:str) -> pd.DataFrame:
