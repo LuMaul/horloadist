@@ -114,7 +114,7 @@ sol.printTable()
 ## Possible Further Improvements
 
 - add plot for geometry and force-vectors
-- add $EI$-$M$ plot for bending stiffnesses imported from csv files
+- add plot for bending stiffnesses imported from csv files
 - add angle param for `KX.globalRectangular(... , angle_from_x : float = ...)`
 
 ## Contributing
