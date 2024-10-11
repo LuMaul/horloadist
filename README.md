@@ -1,4 +1,4 @@
-# `horloadist` - calculate planar (*hor*izontal) *load* *dist*ribution
+# `horloadist` - calculate planar (**hor**izontal) **load** **dist**ribution
 
 > Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
