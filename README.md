@@ -41,6 +41,8 @@ tor. Ts   : 2.4672
 
 ## Example Plot of `NonLinSolve`
 
+See example `NONLIN_main.py`in the examples directory.
+
 ![non linear example](example_nlsolve.png "non linear convergation process")
 
 
