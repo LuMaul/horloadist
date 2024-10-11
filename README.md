@@ -1,9 +1,8 @@
 # `horloadist`
 
-> Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
-
-
 Calculate planar **hor**izontal **load** **dist**ribution:
+
+> Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
 This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate or shell, along with supports that represent walls and their bending stiffnesses around the x and y axes. Afterwards you can calculate the horizontal reaction forces on the support nodes (walls). Use `NonLinSolve` for solving systems iterative with nonlinear wall bending stiffnesses taken from user created csv files.
 
