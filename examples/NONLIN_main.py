@@ -32,7 +32,7 @@ sol = NonLinSolve(struc, 1000, 1000, z_heigt=5)
 
 res = sol._table_onlyUpdates
 
-plot_nlsolve(res)
+plot_nlsolve(res, show=True, save=False)
 
 
 

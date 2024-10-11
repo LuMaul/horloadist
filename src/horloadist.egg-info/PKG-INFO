@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: horloadist
-Version: 1.1.1
+Version: 1.1.2
 Summary: Calculates the horizontal load distribution on supports in the plane
 Author-email: "L.Maul" <saculluam@hotmail.com>
 Maintainer-email: "L.Maul" <saculluam@hotmail.com>
@@ -46,14 +46,15 @@ Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: scipy
 Requires-Dist: matplotlib
+Requires-Dist: datetime
 
 # Calculate Load Distribution In The Plane
 
 > Caution! Do not blindly trust this calculation, but always check the plausibility of the results.
 
-This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Currently, it only works with constant stiffness values.
+This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Use `NonLinSolve` for solving systems with nonlinear wall bending stiffnesses taken from csv files. 
 
-## Example Output
+## Example Table Output of `LinSolve`
 
 ```
 polyg. area           : 375.0000
@@ -88,12 +89,17 @@ tor. Ts   : 2.4672
 6        7       0.0 -0.331345   0.000140  3.993476e-02 -0.000140 -0.291411
 ```
 
+## Example Plot of `NonLinSolve`
+
+![non linear example](example_nlsolve.png "non linear convergation process")
+
 
 ## Prerequisites
 
 - Python 3.x
 - pandas
 - numpy
+- matplotlib
 - `horloadist` library
 
 ## Installation
@@ -151,4 +157,5 @@ sol.printTable()
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. 
+If you'd like to add a graphical output of the geometry, feel free.

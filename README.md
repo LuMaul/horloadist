@@ -4,7 +4,7 @@
 
 This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a plate, along with supports that represent walls and their bending stiffnesses around the x and y axes. Use `NonLinSolve` for solving systems with nonlinear wall bending stiffnesses taken from csv files. 
 
-## Example Output
+## Example Table Output of `LinSolve`
 
 ```
 polyg. area           : 375.0000
@@ -38,6 +38,10 @@ tor. Ts   : 2.4672
 5        6       0.0 -0.331345   0.000068  2.003266e-02 -0.000068 -0.311313
 6        7       0.0 -0.331345   0.000140  3.993476e-02 -0.000140 -0.291411
 ```
+
+## Example Plot of `NonLinSolve`
+
+![non linear example](example_nlsolve.png "non linear convergation process")
 
 
 ## Prerequisites
@@ -103,4 +107,5 @@ sol.printTable()
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. 
+If you'd like to add a graphical output of the geometry, feel free.
