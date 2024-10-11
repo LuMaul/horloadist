@@ -35,6 +35,8 @@ def plot_nlsolve(
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
     fig:mpl_fig.Figure = fig
 
+    fig.tight_layout(pad=3)
+
     fig.suptitle('non linear iteration progress', fontsize=13)
 
     def plot_cols(
@@ -80,7 +82,7 @@ def plot_nlsolve(
 
     if save:
         current_time = datetime.now()
-        formatted_time = f'{current_time:%Y-%m-%d}'
+        formatted_time = f'{current_time:%Y-%m-%d_%H%M%S}'
         plt.savefig(f'{formatted_time}_nlsolve{format}')
 
     if show:
