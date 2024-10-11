@@ -1,10 +1,10 @@
 from horloadist import SupportNode, Polygon, Stucture, LinSolve
 
 def globalIy(dx, dy):
-    return dx*dy**3/12
+    return dy*dx**3/12
 
 def globalIx(dx, dy):
-    return dy*dx**3/12
+    return dx*dy**3/12
 
 
 w1 = SupportNode(1, -10.0,  2.5, globalIy(5, 0.3), globalIx(5, 0.3))
