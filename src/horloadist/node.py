@@ -52,7 +52,7 @@ class SupportNode:
         self._glob_EIx = glob_kx
 
         # updated via Solvers
-        self._Rx:float|int = 0
-        self._Ry:float|int = 0
+        self._Rx = 0.0
+        self._Ry = 0.0
 
 
