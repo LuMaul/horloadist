@@ -86,4 +86,5 @@ def plot_nlsolve(
         plt.savefig(f'{formatted_time}_nlsolve{format}')
 
     if show:
-        plt.show()
+        pass
+        # plt.show()
