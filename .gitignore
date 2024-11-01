@@ -2,3 +2,4 @@ __pycache__
 .vscode
 *.pdf
 *.png
+!example_nlsolve_rev.png

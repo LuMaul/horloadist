@@ -46,7 +46,7 @@ tor. Ts = Ts,x + Ts,y   : 2.4672
 
 Output of `plot_nlsolve` from `NONLIN_main.py` in the examples directory:
 
-![non linear example](example_nlsolve.png "non linear convergation process")
+![non linear example](example_nlsolve_rev.png "non linear convergation process")
 
 
 ## Prerequisites
