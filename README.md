@@ -9,36 +9,37 @@ This project provides a tool for structural analysis using the `horloadist` libr
 ## Example Table Output of `LinSolve`
 
 ```
-polyg. area           : 375.0000
-polyg. centre [xm,ym] : 0.0000, 0.0000 
-stiff. centre [xs,ys] : 2.4672, -4.7664
-EIx total             : 9.4
-EIy total             : 34.4
-EIw total             : 1,937.0
+glo mass   centre [x,y] : 0.0000, 0.0000
+glo stiff. centre [x,y] : 2.4672, -4.7664
+loc stiff. centre [x,y] : 2.4672, -4.7664
+EIx total               : 9.4
+EIy total               : 34.4
+EIw total               : 1,937.0
 
-   node nr     x    y  x-xm  y-ym     xm-xs       ym-ys      EIx       EIy     % EIx     % EIy    % EIwx        % EIwy
-0        1 -10.0  2.5 -10.0   2.5  12.467197  -7.266411  0.01125   3.12500  0.090820  0.001193 -0.011723 -7.240963e-05
-1        2 -12.5  0.0 -12.5   0.0  14.967197  -4.766411  3.12500   0.01125  0.000327  0.331345 -0.000028 -2.414713e-02
-2        3 -10.0 -2.5 -10.0  -2.5  12.467197  -2.266411  0.01125   3.12500  0.090820  0.001193 -0.003656 -7.240963e-05
-3        4   0.0  7.5   0.0   7.5   2.467197 -12.266411  0.01125   3.12500  0.090820  0.001193 -0.019790 -1.432951e-05
-4        5   2.5 -7.5   2.5  -7.5  -0.032803   2.733589  0.02250  25.00000  0.726559  0.002386  0.035282  3.810425e-07
-5        6   7.5  0.0   7.5   0.0  -5.032803  -4.766411  3.12500   0.01125  0.000327  0.331345 -0.000028  8.119605e-03
-6        7  12.5  5.0  12.5   5.0 -10.032803  -9.766411  3.12500   0.01125  0.000327  0.331345 -0.000057  1.618629e-02
+   node nr  glo x  glo y  loc x  loc y    loc xs      loc ys      EIx       EIy     % EIx     % EIy    % EIwx        % EIwy
+0        1  -10.0    2.5  -10.0    2.5 -12.467197   7.266411  0.01125   3.12500  0.090820  0.001193  0.011723 -7.240963e-05
+1        2  -12.5    0.0  -12.5    0.0 -14.967197   4.766411  3.12500   0.01125  0.000327  0.331345  0.000028 -2.414713e-02
+2        3  -10.0   -2.5  -10.0   -2.5 -12.467197   2.266411  0.01125   3.12500  0.090820  0.001193  0.003656 -7.240963e-05
+3        4    0.0    7.5    0.0    7.5  -2.467197  12.266411  0.01125   3.12500  0.090820  0.001193  0.019790 -1.432951e-05
+4        5    2.5   -7.5    2.5   -7.5   0.032803  -2.733589  0.02250  25.00000  0.726559  0.002386 -0.035282  3.810425e-07
+5        6    7.5    0.0    7.5    0.0   5.032803   4.766411  3.12500   0.01125  0.000327  0.331345  0.000028  8.119605e-03
+6        7   12.5    5.0   12.5    5.0  10.032803   9.766411  3.12500   0.01125  0.000327  0.331345  0.000057  1.618629e-02
 
 
-Fx, Fy    : 0, -1
-tor. Ts,x : 0.0000
-tor. Ts,y : 2.4672
-tor. Ts   : 2.4672
+Fx, Fy                  : 0, -1
+ex, ey                  : 2.4672, -4.7664
+tor. Ts,x  =  Fx * ey   : -0.0000
+tor. Ts,y  =  Fy * ex   : 2.4672
+tor. Ts = Ts,x + Ts,y   : 2.4672
 
-   node nr  Vx ~ EIx  Vy ~ EIy  Vx ~ EIwx     Vy ~ EIwy        Vx        Vy
-0        1       0.0 -0.001193   0.028923 -1.786488e-04 -0.028923 -0.001371
-1        2       0.0 -0.331345   0.000068 -5.957571e-02 -0.000068 -0.390921
-2        3       0.0 -0.001193   0.009021 -1.786488e-04 -0.009021 -0.001371
-3        4       0.0 -0.001193   0.048825 -3.535372e-05 -0.048825 -0.001228
-4        5       0.0 -0.002386  -0.087047  9.401069e-07  0.087047 -0.002385
-5        6       0.0 -0.331345   0.000068  2.003266e-02 -0.000068 -0.311313
-6        7       0.0 -0.331345   0.000140  3.993476e-02 -0.000140 -0.291411
+   node nr  Vx ~ EIx  Vy ~ EIy  Ts ~ EIwx     Ts ~ EIwy        Vx        Vy
+0        1       0.0 -0.001193  -0.028923 -1.786488e-04 -0.028923 -0.001371
+1        2       0.0 -0.331345  -0.000068 -5.957571e-02 -0.000068 -0.390921
+2        3       0.0 -0.001193  -0.009021 -1.786488e-04 -0.009021 -0.001371
+3        4       0.0 -0.001193  -0.048825 -3.535372e-05 -0.048825 -0.001228
+4        5       0.0 -0.002386   0.087047  9.401069e-07  0.087047 -0.002385
+5        6       0.0 -0.331345  -0.000068  2.003266e-02 -0.000068 -0.311313
+6        7       0.0 -0.331345  -0.000140  3.993476e-02 -0.000140 -0.291411
 ```
 
 ## Example Output of `NonLinSolve`
@@ -77,10 +78,10 @@ The main script demonstrates how to use the `horloadist` library to create a str
 2. Define helper functions for moment of inertia calculations:
    ```python
    def globalIy(dx, dy):
-       # ...
+      return dy*dx**3/12
     
    def globalIx(dx, dy):
-       # ...
+      return dx*dy**3/12
    ```
 
 3. Create support nodes using the `SupportNode` class.
@@ -95,15 +96,15 @@ The provided example creates a plate structure with seven support nodes and solv
 
 ```python
 # Create support nodes
-w1 = SupportNode(1, -10.0,  2.5, globalIy(5, 0.3), globalIx(5, 0.3))
+w1 = SupportNode(nr=1, glob_x=-10.0,  glob_y=2.5, glob_kx=globalIy(5, 0.3), glob_ky=globalIx(5, 0.3))
 # ... (other nodes)
 
 # Define the plate
 plate = Polygon([[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
 
 # Create and solve the structure
-struc = Stucture(plate, [w1, w2, w3, w4, w5, w6, w7])
-sol = LinSolve(struc, 0, 1)
+struc = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=plate.centroid)
+sol = LinSolve(structure=struc, x_mass_force=0, y_mass_force=-1)
 
 # Print results
 struc.printTable()
