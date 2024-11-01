@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from copy import deepcopy
 
 from .polygon import Polygon
@@ -66,10 +67,16 @@ class Stucture:
     _result_table : pd.DataFrame
         DataFrame containing various structural properties and node data.
     """  
-    def __init__(self, polygon:Polygon, nodes:list[SupportNode], verbose:bool=True):
-        self._polygon = polygon
-        self._verbose = verbose
+    def __init__(
+            self,
+            nodes:list[SupportNode],
+            glo_mass_centre:tuple[float, float]|np.ndarray,
+            verbose:bool=True
+            ):
+        
         self._nodes = nodes
+        self._glo_mass_centre_x, self._glo_mass_centre_y = glo_mass_centre
+        self._verbose = verbose
         self._linnodes = self._to_linear_nodes(deepcopy(nodes))
 
 
@@ -94,20 +101,28 @@ class Stucture:
             return node
         
         return [extractStiffnessAtMomentZero(node) for node in nodes]
-
     
+
     @property
     def _node_numbers(self) -> pd.Series:
         return pd.Series([node._nr for node in self._linnodes])
     
     @property
-    def _node_x(self) -> pd.Series:
+    def _glo_node_x(self) -> pd.Series:
         return pd.Series([node._glob_x for node in self._linnodes])
 
     @property
-    def _node_y(self) -> pd.Series:
+    def _glo_node_y(self) -> pd.Series:
         return pd.Series([node._glob_y for node in self._linnodes])
     
+    @property
+    def _loc_node_x(self) -> pd.Series:
+        return self._glo_node_x - self._glo_mass_centre_x
+    
+    @property
+    def _loc_node_y(self) -> pd.Series:
+        return self._glo_node_y - self._glo_mass_centre_y
+
     @property
     def _node_EIy(self) -> pd.Series:
         return pd.Series([node._glob_EIy for node in self._linnodes])
@@ -117,32 +132,32 @@ class Stucture:
         return pd.Series([node._glob_EIx for node in self._linnodes])
     
     @property
-    def _node_diff_x_xm(self) -> pd.Series:
-        return self._node_x - self._polygon.centroid[0]
-    
-    @property
-    def _node_diff_y_ym(self) -> pd.Series:
-        return self._node_y - self._polygon.centroid[1]
-
-    @property
-    def _stiff_centre_x(self) -> float:
-        x_xm = self._node_diff_x_xm
+    def _loc_stiff_centre_x(self) -> float:
+        x_xm = self._loc_node_x
         EIx = self._node_EIx
         return (EIx * x_xm).sum() / EIx.sum()
 
     @property
-    def _stiff_centre_y(self) -> float:
-        y_ym = self._node_diff_y_ym
+    def _loc_stiff_centre_y(self) -> float:
+        y_ym = self._loc_node_y
         EIy = self._node_EIy
         return (EIy * y_ym).sum() / EIy.sum()
+
+    @property
+    def _glo_stiff_centre_x(self) -> float:
+        return self._loc_stiff_centre_x + self._glo_mass_centre_x
+
+    @property
+    def _glo_stiff_centre_y(self) -> float:
+        return self._loc_stiff_centre_y + self._glo_mass_centre_y
+
+    @property
+    def _loc_node_xs(self) -> pd.Series:
+        return self._glo_node_x - self._glo_stiff_centre_x
     
     @property
-    def _node_diff_xs_xm(self) -> pd.Series:
-        return self._stiff_centre_x - self._node_x
-    
-    @property
-    def _node_diff_ys_ym(self) -> pd.Series:
-        return self._stiff_centre_y - self._node_y
+    def _loc_node_ys(self) -> pd.Series:
+        return self._glo_node_y - self._glo_stiff_centre_y
     
     @property
     def _node_EIx_proportion(self) -> pd.Series:
@@ -156,29 +171,29 @@ class Stucture:
     def _global_EIw(self) -> pd.Series:
         EIy = self._node_EIy
         EIx = self._node_EIx
-        x = self._node_diff_xs_xm
-        y = self._node_diff_ys_ym
+        x = self._loc_node_xs
+        y = self._loc_node_ys
         return (EIy*y**2 + EIx*x**2).sum()
     
     @property
     def _node_EIwx_proportion(self) -> pd.Series:
-        return  self._node_EIy * self._node_diff_ys_ym / self._global_EIw
+        return self._node_EIy * self._loc_node_ys / self._global_EIw
     
     @property
     def _node_EIwy_proportion(self) -> pd.Series:
-        return -self._node_EIx * self._node_diff_xs_xm / self._global_EIw
+        return self._node_EIx * self._loc_node_xs / self._global_EIw
     
     @property
     def _result_table(self) -> pd.DataFrame:
 
         result_table = {
             'node nr':self._node_numbers,
-            'x':self._node_x,
-            'y':self._node_y,
-            'x-xm':self._node_diff_x_xm,
-            'y-ym':self._node_diff_y_ym,
-            'xm-xs ':self._node_diff_xs_xm,
-            'ym-ys':self._node_diff_ys_ym,
+            'glo x':self._glo_node_x,
+            'glo y':self._glo_node_y,
+            'loc x':self._loc_node_x,
+            'loc y':self._loc_node_y,
+            'loc xs ':self._loc_node_xs,
+            'loc ys':self._loc_node_ys,
             'EIx':self._node_EIx,
             'EIy':self._node_EIy,
             '% EIx':self._node_EIx_proportion,
@@ -205,19 +220,20 @@ class Stucture:
         """
         print(
             "\n"
-            f"polyg. area           : "
-            f"{self._polygon.area:0.4f}\n"
-            f"polyg. centre [xm,ym] : "
-            f"{self._polygon.centroid[0]:0.4f}, "
-            f"{self._polygon.centroid[1]:0.4f} \n"
-            f"stiff. centre [xs,ys] : "
-            f"{self._stiff_centre_x:0.4f}, "
-            f"{self._stiff_centre_y:0.4f}\n"
-            f"EIx total             : "
+            f"glo mass   centre [x,y] : "
+            f"{self._glo_mass_centre_x:0.4f}, "
+            f"{self._glo_mass_centre_y:0.4f}\n"
+            f"glo stiff. centre [x,y] : "
+            f"{self._glo_stiff_centre_x:0.4f}, "
+            f"{self._glo_stiff_centre_y:0.4f}\n"
+            f"loc stiff. centre [x,y] : "
+            f"{self._loc_stiff_centre_x:0.4f}, "
+            f"{self._loc_stiff_centre_y:0.4f}\n"
+            f"EIx total               : "
             f"{self._node_EIx.sum():,.1f}\n"
-            f"EIy total             : "
+            f"EIy total               : "
             f"{self._node_EIy.sum():,.1f}\n"
-            f"EIw total             : "
+            f"EIw total               : "
             f"{self._global_EIw:,.1f}\n"
             f"\n{self._result_table}\n"
             )
