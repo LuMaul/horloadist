@@ -18,8 +18,29 @@ w2 = SupportNode(nr=2, glob_x=7.00, glob_y=4.00, glob_kx=kx2, glob_ky=ky2)
 w3 = SupportNode(nr=3, glob_x=6.00, glob_y=5.00, glob_kx=kx3, glob_ky=ky3)
 w4 = SupportNode(nr=4, glob_x=2.00, glob_y=4.00, glob_kx=kx4, glob_ky=ky4)
 
-
 poly = Polygon([[0, 0], [7, 0], [7, 4], [0, 4]])
+
+s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
+
+s1.printTable()
+
+ls1 = LinSolve(s1, x_mass_force=1, y_mass_force=1)
+
+ls1.printTable()
+
+
+# different coordinate system
+
+print('\n=========== changed coord system ===========\n')
+
+dx, dy = -3.50, -2.00
+
+poly = Polygon([[0+dx, 0+dy], [7+dx, 0+dy], [7+dx, 4+dy], [0+dx, 4+dy]])
+
+w1 = SupportNode(nr=1, glob_x=3.50+dx, glob_y=0.00+dy, glob_kx=kx1, glob_ky=ky1)
+w2 = SupportNode(nr=2, glob_x=7.00+dx, glob_y=4.00+dy, glob_kx=kx2, glob_ky=ky2)
+w3 = SupportNode(nr=3, glob_x=6.00+dx, glob_y=5.00+dy, glob_kx=kx3, glob_ky=ky3)
+w4 = SupportNode(nr=4, glob_x=2.00+dx, glob_y=4.00+dy, glob_kx=kx4, glob_ky=ky4)
 
 s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
 
