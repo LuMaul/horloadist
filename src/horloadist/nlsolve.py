@@ -56,7 +56,7 @@ class NonLinSolve:
             structure:Stucture,
             x_mass_force:float=1,
             y_mass_force:float=1,
-            iterations:int=40,
+            iterations:int=20,
             z_heigt:float=1,
             verbose:bool=True
             ) -> None:
@@ -111,8 +111,8 @@ class NonLinSolve:
 
     def _update_structure_tracker(self, structure:Stucture, init=False) -> None:
         TRACKING_REGISTER = {
-            f'x_s':[structure._stiff_centre_x],
-            f'y_s':[structure._stiff_centre_y],
+            f'x_s':[structure._loc_stiff_centre_x],
+            f'y_s':[structure._loc_stiff_centre_y],
         }
         if init:
             for key, item in TRACKING_REGISTER.items():
