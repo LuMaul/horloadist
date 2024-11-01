@@ -29,7 +29,8 @@ def plot_nlsolve(
         res_table:pd.DataFrame,
         show:bool=True,
         save:bool=False,
-        format:str='.pdf'
+        fname:str|None=None,
+        format:str='pdf'
         ) -> None:
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
@@ -83,8 +84,10 @@ def plot_nlsolve(
     if save:
         current_time = datetime.now()
         formatted_time = f'{current_time:%Y-%m-%d_%H%M%S}'
-        plt.savefig(f'{formatted_time}_nlsolve{format}')
+        if fname:
+            plt.savefig(f'{fname}.{format}')
+        else:
+            plt.savefig(f'{formatted_time}_nlsolve.{format}')
 
     if show:
-        pass
-        # plt.show()
+        plt.show()
