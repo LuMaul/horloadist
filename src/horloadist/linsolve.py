@@ -52,14 +52,22 @@ class LinSolve:
         self._x_force = x_mass_force
         self._y_force = y_mass_force
 
+    @property
+    def _eccentricity_x(self):
+        return self._structure._loc_stiff_centre_x
+    
+    @property
+    def _eccentricity_y(self):
+        return self._structure._loc_stiff_centre_y
 
     @property
     def _torsion_Ts_from_x(self) -> float:
-        return -self._x_force * (self._structure._polygon.centroid[1]-self._structure._stiff_centre_y)
+        return  self._x_force * (self._eccentricity_y)
     
     @property
     def _torsion_Ts_from_y(self) -> float:
-        return  self._y_force * (self._structure._polygon.centroid[0]-self._structure._stiff_centre_x)
+        return -self._y_force * (self._eccentricity_x)
+    
     @property
     def _torsion_Ts(self) -> float:
         return self._torsion_Ts_from_x + self._torsion_Ts_from_y
@@ -73,20 +81,20 @@ class LinSolve:
         return self._structure._node_EIy_proportion * self._y_force
     
     @property
-    def _node_Vx_from_EIwx(self) -> pd.Series:
-        return -self._structure._node_EIwx_proportion * self._torsion_Ts
+    def _node_Ts_from_EIwx(self) -> pd.Series:
+        return - self._structure._node_EIwx_proportion * self._torsion_Ts
     
     @property
-    def _node_Vy_from_EIwy(self) -> pd.Series:
-        return  self._structure._node_EIwy_proportion * self._torsion_Ts
+    def _node_Ts_from_EIwy(self) -> pd.Series:
+        return   self._structure._node_EIwy_proportion * self._torsion_Ts
     
     @property
     def _node_final_Vx(self) -> pd.Series:
-        return self._node_Vx_from_EIx - self._node_Vx_from_EIwx
+        return self._node_Vx_from_EIx + self._node_Ts_from_EIwx
     
     @property
     def _node_final_Vy(self) -> pd.Series:
-        return self._node_Vy_from_EIy + self._node_Vy_from_EIwy
+        return self._node_Vy_from_EIy + self._node_Ts_from_EIwy
     
 
     @property
@@ -96,8 +104,8 @@ class LinSolve:
             'node nr':self._structure._node_numbers,
             'Vx ~ EIx':self._node_Vx_from_EIx,
             'Vy ~ EIy':self._node_Vy_from_EIy,
-            'Vx ~ EIwx':self._node_Vx_from_EIwx,
-            'Vy ~ EIwy':self._node_Vy_from_EIwy,
+            'Ts ~ -EIwx':self._node_Ts_from_EIwx,
+            'Ts ~ EIwy':self._node_Ts_from_EIwy,
             'Vx':self._node_final_Vx,
             'Vy':self._node_final_Vy,
         }
@@ -119,10 +127,11 @@ class LinSolve:
         """
         print(
             "\n"
-            f"Fx, Fy    : {self._x_force}, {self._y_force}\n"
-            f"tor. Ts,x : {self._torsion_Ts_from_x:0.4f}\n"
-            f"tor. Ts,y : {self._torsion_Ts_from_y:0.4f}\n"
-            f"tor. Ts   : {self._torsion_Ts :0.4f}\n"
+            f"Fx, Fy                  : {self._x_force}, {self._y_force}\n"
+            f"ex, ey                  : {self._eccentricity_x:0.4f}, {self._eccentricity_y:0.4f}\n"
+            f"tor. Ts,x  =  Fx * ey   : {self._torsion_Ts_from_x:0.4f}\n"
+            f"tor. Ts,y  =  Fy * ex   : {self._torsion_Ts_from_y:0.4f}\n"
+            f"tor. Ts = Ts,x + Ts,y   : {self._torsion_Ts :0.4f}\n"
             f"\n{self._table}\n"
             )
         
