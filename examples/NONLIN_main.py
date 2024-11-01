@@ -24,7 +24,7 @@ w11 = SupportNode(11, 1.5, 4.875, kx11, 0)
 
 shell = Polygon(glob_xy=[[0, 0], [3, 0], [3, 2], [7, 2], [7, 5], [0, 5]])
 
-struc = Stucture(shell, [w7, w8, w9, w10, w11], verbose=False)
+struc = Stucture(nodes=[w7, w8, w9, w10, w11], glo_mass_centre=shell.centroid, verbose=False)
 
 sol = NonLinSolve(struc, 1000, 1000, z_heigt=5)
 
@@ -32,7 +32,7 @@ sol = NonLinSolve(struc, 1000, 1000, z_heigt=5)
 
 res = sol._table_onlyUpdates
 
-plot_nlsolve(res, show=True, save=False, format='.png')
+plot_nlsolve(res, show=True, save=True, fname='example_nlsolve', format='png')
 
 
 
