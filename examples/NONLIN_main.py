@@ -4,13 +4,12 @@ from horloadist.utils import plot_nlsolve
 import os
 import pandas as pd
 
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def constrPth(fname:str) -> str:
     CSV_ROOT = 'stiffness_data'
     return os.path.join(CSV_ROOT, fname)
-
-print(os.listdir('stiffness_data'))
 
 ky7 = KX.from_csv(constrPth('7 mchi csa N-41.4 kN.csv'), 'mom', 'EI')
 ky8 = KX.from_csv(constrPth('8 mchi csa N-30.3 kN.csv'), 'mom', 'EI')
@@ -29,7 +28,7 @@ shell = Polygon(glob_xy=[[0, 0], [3, 0], [3, 2], [7, 2], [7, 5], [0, 5]])
 
 struc = Stucture(nodes=[w7, w8, w9, w10, w11], glo_mass_centre=shell.centroid, verbose=False)
 
-load = XYLoad(x_magnitude=5, y_magnitude=5)
+load = XYLoad(x_magnitude=1000, y_magnitude=1000)
 
 sol = NonLinSolve(struc, load, z_heigt=5)
 
