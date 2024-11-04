@@ -4,7 +4,6 @@ from horloadist.utils import plot_nlsolve
 import os
 import pandas as pd
 
-
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def constrPth(fname:str) -> str:
