@@ -54,7 +54,6 @@ def plot_nlsolve(
 
 
     def plot_xy_s(ax: mpl_axes.Axes, xCol: str, yCol: str) -> None:
-        print(res_table)
         x = res_table[xCol]
         y = res_table[yCol]
 
