@@ -13,64 +13,71 @@ import horloadist.converters.to_rfem as rfem_conv
 
 class Stucture:
     """
-    A class to represent a structural system defined by a polygon and a list of support nodes.
+    Structure class for managing the geometric and stiffness properties of a structural system.
 
     Parameters
     ----------
-    polygon : Polygon
-        The polygon that defines the structural geometry.
-    nodes : list of SupportNode
-        A list of support nodes associated with the structure.
-    
+    nodes : list[SupportNode]
+        List of SupportNode objects representing the nodes in the structure.
+    glo_mass_centre : tuple[float, float] or np.ndarray
+        Global mass center coordinates [x, y].
+    verbose : bool, optional
+        Flag indicating whether to print verbose information. Defaults to True.
+
     Attributes
     ----------
-    _polygon : Polygon
-        The polygon object representing the structural geometry.
-    _nodes : list of SupportNode
-        List of support nodes forming the structure.
+    _nodes : list[SupportNode]
+        List of SupportNode objects representing the nodes in the structure.
+    _glo_mass_centre : np.ndarray
+        Numpy array containing the global mass center coordinates [x, y].
+    _verbose : bool
+        Flag indicating whether to print verbose information.
+    _linnodes : list[SupportNode]
+        List of linear SupportNode objects.
     _node_numbers : pd.Series
-        Series representing the node numbers of the structure.
-    _node_x : pd.Series
-        Series representing the x-coordinates of the nodes.
-    _node_y : pd.Series
-        Series representing the y-coordinates of the nodes.
+        Series of node numbers.
+    _glo_node_x : pd.Series
+        Series of global x-coordinates of the nodes.
+    _glo_node_y : pd.Series
+        Series of global y-coordinates of the nodes.
+    _loc_node_x : pd.Series
+        Series of local x-coordinates of the nodes.
+    _loc_node_y : pd.Series
+        Series of local y-coordinates of the nodes.
     _node_EIy : pd.Series
-        Series representing the flexural stiffness of nodes along the y-axis.
+        Series of EIy values for the nodes.
     _node_EIx : pd.Series
-        Series representing the flexural stiffness of nodes along the x-axis.
-    _node_diff_x_xm : pd.Series
-        Series representing the difference between node x-coordinates and the
-        polygon centroid x-coordinate.
-    _node_diff_y_ym : pd.Series
-        Series representing the difference between node y-coordinates and the
-        polygon centroid y-coordinate.
-    _stiff_centre_x : float
-        The x-coordinate of the stiffness center of the structure.
-    _stiff_centre_y : float
-        The y-coordinate of the stiffness center of the structure.
-    _node_diff_xs_xm : pd.Series
-        Series representing the difference between the stiffness center
-        x-coordinate and node x-coordinates.
-    _node_diff_ys_ym : pd.Series
-        Series representing the difference between the stiffness center
-        y-coordinate and node y-coordinates.
+        Series of EIx values for the nodes.
+    _loc_stiff_centre : np.ndarray
+        Numpy array containing the local stiffness center coordinates [x, y].
+    _glo_stiff_centre : np.ndarray
+        Numpy array containing the global stiffness center coordinates [x, y].
+    _loc_node_xs : pd.Series
+        Series of local x-coordinates of the nodes relative to the stiffness center.
+    _loc_node_ys : pd.Series
+        Series of local y-coordinates of the nodes relative to the stiffness center.
     _node_EIx_proportion : pd.Series
-        Series representing the proportion of the total flexural stiffness
-        along the x-axis for each node.
+        Series of the proportion of EIx for each node.
     _node_EIy_proportion : pd.Series
-        Series representing the proportion of the total flexural stiffness
-        along the y-axis for each node.
+        Series of the proportion of EIy for each node.
     _global_EIw : pd.Series
-        Series representing the global warping stiffness.
+        Series of the global warping stiffness.
     _node_EIwx_proportion : pd.Series
-        Series representing the proportion of the torsional stiffness
-        contribution for each node along the x-axis.
+        Series of the proportion of EIwx for each node.
     _node_EIwy_proportion : pd.Series
-        Series representing the proportion of the torsional stiffness
-        contribution for each node along the y-axis.
+        Series of the proportion of EIwy for each node.
     _result_table : pd.DataFrame
-        DataFrame containing various structural properties and node data.
-    """  
+        DataFrame containing the detailed summary of the structure's geometric and stiffness properties.
+
+    Methods
+    -------
+    _to_linear_nodes(nodes: list[SupportNode]) -> list[SupportNode]
+        Converts the input nodes to a list of linear SupportNode objects.
+    printTable() -> None
+        Prints a detailed summary of the structure's geometric and stiffness properties.
+    to_rfem(polygon: Polygon, **rfem_model_kwargs) -> None
+        Exports the structure to an RFEM model.
+    """
     def __init__(
             self,
             nodes:list[SupportNode],
