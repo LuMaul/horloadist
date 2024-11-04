@@ -9,6 +9,7 @@ from horloadist.node import SupportNode
 from horloadist.utils import interpolateXY
 
 import horloadist.converters.to_rfem as rfem_conv
+import horloadist.converters.to_matplotlib as plt_conv
 
 
 class Stucture:
@@ -263,3 +264,18 @@ class Stucture:
         # rfem_conv.Model.clientModel.service.finish_modification()
 
         # rfem_conv.Calculate_all()
+
+
+    def to_plt(self, polygon:Polygon, name:str='', **suplot_kwargs) -> None:
+        fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
+        plt_conv.get_plt_size(ax, self._glo_node_x, self._glo_node_y, polygon)
+
+        self.printTable()
+        
+        plt_conv.to_plt_polygon(ax, polygon)
+        
+        for node in self._nodes:
+            plt_conv.to_plt_node(ax, node)
+
+
+        plt_conv.plt.show()

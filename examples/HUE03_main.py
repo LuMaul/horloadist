@@ -23,6 +23,8 @@ plate = Polygon(glob_xy=[[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
 struc = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=plate.centroid)
 struc.printTable()
 
+struc.to_plt(plate)
+
 load = XYLoad(y_magnitude=1)
 
 sol = LinSolve(structure=struc, load=load)
