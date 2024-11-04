@@ -10,47 +10,48 @@ import horloadist.converters.to_rfem as rfem_conv
 
 class LinSolve:
     """
-    A class to represent the linear solver for a structure subjected to forces 
-    and torsion.
+    A class to represent the linear solver for a structure subjected to forces and torsion.
+    
+    This solver calculates forces and moments on a structure based on applied loads,
+    eccentricities, and nodal properties. It can also convert these forces to a format
+    compatible with RFEM models.
 
     Parameters
     ----------
     structure : Structure
-        The structure object that contains the necessary geometric and stiffness information.
-    x_mass_force : float, optional
-        The force applied in the x-direction at the mass centre (default is 1).
-    y_mass_force : float, optional
-        The force applied in the y-direction at the mass centre (default is 1).
-    
+        The structure object containing geometry and stiffness details.
+    load : XYLoad
+        Load object specifying magnitudes of x and y forces applied to the structure.
+
     Attributes
     ----------
     _structure : Structure
-        The structure object containing information about the geometry and stiffness center.
+        The structure object with geometry and stiffness properties.
     _x_force : float
-        Force acting along the x-axis.
+        The force applied along the x-axis.
     _y_force : float
-        Force acting along the y-axis.
+        The force applied along the y-axis.
     _torsion_Ts_from_x : float
-        Torsion moment caused by force in the x-direction.
+        Torsion moment caused by the x-direction force.
     _torsion_Ts_from_y : float
-        Torsion moment caused by force in the y-direction.
+        Torsion moment caused by the y-direction force.
     _torsion_Ts : float
-        Total torsion moment caused by both x and y forces.
+        Total torsion moment due to forces in both x and y directions.
     _node_Vx_from_EIx : pd.Series
-        Nodal force in the x-direction based on flexural rigidity (EIx).
+        Nodal forces in the x-direction based on flexural rigidity (EIx).
     _node_Vy_from_EIy : pd.Series
-        Nodal force in the y-direction based on flexural rigidity (EIy).
-    _node_Vx_from_EIwx : pd.Series
-        Nodal force in the x-direction caused by torsion moment (EIwx).
-    _node_Vy_from_EIwy : pd.Series
-        Nodal force in the y-direction caused by torsion moment (EIwy).
+        Nodal forces in the y-direction based on flexural rigidity (EIy).
+    _node_Ts_from_EIwx : pd.Series
+        Nodal forces in the x-direction due to torsion moments (EIwx).
+    _node_Ts_from_EIwy : pd.Series
+        Nodal forces in the y-direction due to torsion moments (EIwy).
     _node_final_Vx : pd.Series
-        Final nodal force in the x-direction after considering both flexural and torsional contributions.
+        Final x-directional nodal force, accounting for both flexural and torsional effects.
     _node_final_Vy : pd.Series
-        Final nodal force in the y-direction after considering both flexural and torsional contributions.
+        Final y-directional nodal force, accounting for both flexural and torsional effects.
     _table : pd.DataFrame
-        DataFrame containing calculated nodal forces in both directions and torsional effects.
-    """  
+        DataFrame containing all calculated nodal forces, including torsional effects.
+    """ 
     def __init__(self, structure:Stucture, load:XYLoad):
         self._structure = structure
         self._load = load

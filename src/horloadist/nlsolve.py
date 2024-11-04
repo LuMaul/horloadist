@@ -17,12 +17,10 @@ class NonLinSolve:
     ----------
     structure : Stucture
         The structural model to be analyzed.
-    x_mass_force : float, optional
-        The mass force in the x-direction (default is 1).
-    y_mass_force : float, optional
-        The mass force in the y-direction (default is 1).
+    load : XYLoad
+        The load object defining forces acting on the structure.
     iterations : int, optional
-        The number of iterations for the non-linear solution (default is 40).
+        The number of iterations for the non-linear solution (default is 20).
     z_heigt : float, optional
         The height in the z-direction for moment calculations (default is 1).
     verbose : bool, optional
@@ -32,6 +30,8 @@ class NonLinSolve:
     ----------
     _structure : Stucture
         The structural model being analyzed.
+    _load : XYLoad
+        The load object defining forces acting on the structure.
     _x_force : float
         The mass force in the x-direction.
     _y_force : float
