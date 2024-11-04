@@ -17,6 +17,8 @@ n3 = SupportNode(nr=3, glob_x=2.50, glob_y=0.00, glob_kx=kx3, glob_ky=ky3)
 
 struc = Stucture(nodes=[n1, n2, n3], glo_mass_centre=(2.50, 2.50))
 
+struc.to_rfem()
+
 struc.printTable()
 
 sol = LinSolve(structure=struc, x_mass_force=1.00, y_mass_force=0.00)

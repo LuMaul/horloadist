@@ -56,3 +56,7 @@ class SupportNode:
         self._Ry = 0.0
 
 
+    def __to_rfem(self) -> None:
+        pass
+
+

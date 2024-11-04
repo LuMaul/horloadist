@@ -1,11 +1,14 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
+import os
 
 from .polygon import Polygon
 from .stiffnesses import KX, KY
 from .node import SupportNode
 from .utils import interpolateXY
+from .converters.to_rfem import init_rfem_model, to_rfem_node
+
 
 class Stucture:
     """
@@ -237,3 +240,8 @@ class Stucture:
             f"{self._global_EIw:,.1f}\n"
             f"\n{self._result_table}\n"
             )
+        
+
+    def to_rfem(self, model_name:str=f'{os.path.basename(__file__)}.rf6', *model_args) -> None:
+        init_rfem_model(model_name, *model_args)
+        to_rfem_node(node=None)
