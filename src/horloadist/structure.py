@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
-import os
 
-from .polygon import Polygon
-from .stiffnesses import KX, KY
-from .node import SupportNode
-from .utils import interpolateXY
-from .converters.to_rfem import init_rfem_model, to_rfem_node
+
+from horloadist.polygon import Polygon
+from horloadist.stiffnesses import KX, KY
+from horloadist.node import SupportNode
+from horloadist.utils import interpolateXY
+
+import horloadist.converters.to_rfem as rfem_conv
 
 
 class Stucture:
@@ -95,12 +96,12 @@ class Stucture:
                     )
 
         def extractStiffnessAtMomentZero(node:SupportNode) -> SupportNode:
-            if isinstance(node._glob_EIx, pd.DataFrame):
-                node._glob_EIx = interpolateXY(node._glob_EIx, MOMENTUM)
-                printInfo(node._nr, 'x', node._glob_EIx)
-            if isinstance(node._glob_EIy, pd.DataFrame):
-                node._glob_EIy = interpolateXY(node._glob_EIy, MOMENTUM)
-                printInfo(node._nr, 'y', node._glob_EIy)
+            if isinstance(node._glo_EIx, pd.DataFrame):
+                node._glo_EIx = interpolateXY(node._glo_EIx, MOMENTUM)
+                printInfo(node._nr, 'x', node._glo_EIx)
+            if isinstance(node._glo_EIy, pd.DataFrame):
+                node._glo_EIy = interpolateXY(node._glo_EIy, MOMENTUM)
+                printInfo(node._nr, 'y', node._glo_EIy)
             return node
         
         return [extractStiffnessAtMomentZero(node) for node in nodes]
@@ -112,11 +113,11 @@ class Stucture:
     
     @property
     def _glo_node_x(self) -> pd.Series:
-        return pd.Series([node._glob_x for node in self._linnodes])
+        return pd.Series([node._glo_x for node in self._linnodes])
 
     @property
     def _glo_node_y(self) -> pd.Series:
-        return pd.Series([node._glob_y for node in self._linnodes])
+        return pd.Series([node._glo_y for node in self._linnodes])
     
     @property
     def _loc_node_x(self) -> pd.Series:
@@ -128,11 +129,11 @@ class Stucture:
 
     @property
     def _node_EIy(self) -> pd.Series:
-        return pd.Series([node._glob_EIy for node in self._linnodes])
+        return pd.Series([node._glo_EIy for node in self._linnodes])
     
     @property
     def _node_EIx(self) -> pd.Series:
-        return pd.Series([node._glob_EIx for node in self._linnodes])
+        return pd.Series([node._glo_EIx for node in self._linnodes])
     
     @property
     def _loc_stiff_centre_x(self) -> float:
@@ -242,6 +243,16 @@ class Stucture:
             )
         
 
-    def to_rfem(self, model_name:str=f'{os.path.basename(__file__)}.rf6', *model_args) -> None:
-        init_rfem_model(model_name, *model_args)
-        to_rfem_node(node=None)
+    def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+        rfem_conv.init_rfem_model(**rfem_model_kwargs)
+        
+        # rfem_conv.Model.clientModel.service.begin_modification()
+
+        for node in self._nodes:
+            rfem_conv.to_rfem_support_node(node=node)
+
+        rfem_conv.to_rfem_shell(polygon)
+
+        # rfem_conv.Model.clientModel.service.finish_modification()
+
+        # rfem_conv.Calculate_all()

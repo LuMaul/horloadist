@@ -1,10 +1,10 @@
 import pandas as pd
-import numpy as np
 
-from .node import SupportNode
-from .structure import Stucture
-from .utils import interpolateXY
-from .linsolve import LinSolve
+from horloadist.node import SupportNode
+from horloadist.structure import Stucture
+from horloadist.utils import interpolateXY
+from horloadist.loads import XYLoad
+from horloadist.linsolve import LinSolve
 
 class NonLinSolve:
     """
@@ -54,15 +54,15 @@ class NonLinSolve:
     def __init__(
             self,
             structure:Stucture,
-            x_mass_force:float=1,
-            y_mass_force:float=1,
+            load:XYLoad,
             iterations:int=20,
             z_heigt:float=1,
             verbose:bool=True
             ) -> None:
         self._structure = structure
-        self._x_force = x_mass_force
-        self._y_force = y_mass_force
+        self._load = load
+        self._x_force = self._load._x_magnitude
+        self._y_force = self._load._y_magnitude
         self._iterations = iterations
         self._z_heigt = z_heigt
 
@@ -84,8 +84,8 @@ class NonLinSolve:
 
     def _update_node_tracker(self, node:SupportNode, init=False) -> None:
         TRACKING_REGISTER = {
-            f'node {node._nr} EIx':[node._glob_EIx],
-            f'node {node._nr} EIy':[node._glob_EIy],
+            f'node {node._nr} EIx':[node._glo_EIx],
+            f'node {node._nr} EIy':[node._glo_EIy],
             f'node {node._nr} Vx':[-node._Rx],
             f'node {node._nr} Vy':[-node._Ry],
             f'node {node._nr} Mx':[-node._Ry * self._z_heigt],
@@ -130,20 +130,20 @@ class NonLinSolve:
             self._structure._linnodes
             )
         for node, linnode in nodes_and_linnodes:
-            if isinstance(node._glob_EIx, pd.DataFrame):
-                linnode._glob_EIx = interpolateXY(
-                    node._glob_EIx,
+            if isinstance(node._glo_EIx, pd.DataFrame):
+                linnode._glo_EIx = interpolateXY(
+                    node._glo_EIx,
                     -linnode._Ry*self._z_heigt
                     )
-            if isinstance(node._glob_EIy, pd.DataFrame):
-                linnode._glob_EIy = interpolateXY(
-                    node._glob_EIy,
+            if isinstance(node._glo_EIy, pd.DataFrame):
+                linnode._glo_EIy = interpolateXY(
+                    node._glo_EIy,
                     -linnode._Rx*self._z_heigt
                     )
 
 
     def _linsolve_inplace(self) -> None:
-        sol = LinSolve(self._structure, self._x_force, self._y_force)
+        sol = LinSolve(self._structure, self._load)
         sol.updateNodes()
 
 
@@ -199,8 +199,7 @@ class NonLinSolve:
         """
         sol = LinSolve(
             self._structure,
-            self._x_force,
-            self._y_force
+            self._load
         )
         sol.printTable()
 

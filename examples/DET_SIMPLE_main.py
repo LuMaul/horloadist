@@ -1,4 +1,4 @@
-from horloadist import KX, KY, Polygon, SupportNode, Stucture, LinSolve
+from horloadist import KX, KY, Polygon, SupportNode, Stucture, LinSolve, XYLoad
 
 # simple statically determined shell 5.00 x 5.00 m with walls left, below, right
 
@@ -11,15 +11,19 @@ ky2 = KY.constRectangular(dx_glob=0.30, dy_glob=5.00)
 kx3 = KX.constRectangular(dx_glob=5.00, dy_glob=0.30)
 ky3 = KY.constRectangular(dx_glob=5.00, dy_glob=0.30)
 
-n1 = SupportNode(nr=1, glob_x=0.00, glob_y=2.50, glob_kx=kx1, glob_ky=ky1)
-n2 = SupportNode(nr=2, glob_x=5.00, glob_y=2.50, glob_kx=kx2, glob_ky=ky2)
-n3 = SupportNode(nr=3, glob_x=2.50, glob_y=0.00, glob_kx=kx3, glob_ky=ky3)
+n1 = SupportNode(nr=1, glo_x=0.00, glo_y=2.50, glo_kx=kx1, glo_ky=ky1)
+n2 = SupportNode(nr=2, glo_x=5.00, glo_y=2.50, glo_kx=kx2, glo_ky=ky2)
+n3 = SupportNode(nr=3, glo_x=2.50, glo_y=0.00, glo_kx=kx3, glo_ky=ky3)
 
 struc = Stucture(nodes=[n1, n2, n3], glo_mass_centre=(2.50, 2.50))
 
-struc.to_rfem()
+poly = Polygon(glob_xy=[[0, 0], [5, 0], [5, 5], [0, 5]])
+
+# struc.to_rfem(poly, connect_to_server=False)
 
 struc.printTable()
 
-sol = LinSolve(structure=struc, x_mass_force=1.00, y_mass_force=0.00)
+load = XYLoad(x_magnitude=1.00)
+
+sol = LinSolve(structure=struc, load=load)
 sol.printTable()

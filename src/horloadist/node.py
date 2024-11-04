@@ -40,23 +40,17 @@ class SupportNode:
     def __init__(
             self,
             nr:int,
-            glob_x:float,
-            glob_y:float,
-            glob_kx:float|pd.DataFrame,
-            glob_ky:float|pd.DataFrame
+            glo_x:float,
+            glo_y:float,
+            glo_kx:float|pd.DataFrame,
+            glo_ky:float|pd.DataFrame
             ):
         self._nr = nr
-        self._glob_x = glob_x
-        self._glob_y = glob_y
-        self._glob_EIy = glob_kx
-        self._glob_EIx = glob_ky
+        self._glo_x = glo_x
+        self._glo_y = glo_y
+        self._glo_EIy = glo_kx
+        self._glo_EIx = glo_ky
 
         # updated via Solvers
         self._Rx = 0.0
         self._Ry = 0.0
-
-
-    def __to_rfem(self) -> None:
-        pass
-
-

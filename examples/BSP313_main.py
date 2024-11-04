@@ -1,4 +1,4 @@
-from horloadist import KX, KY, SupportNode, Polygon, Stucture, LinSolve
+from horloadist import KX, KY, SupportNode, Polygon, Stucture, LinSolve, XYLoad
 
 
 kx1 = KX.constRectangular(0.25, 4)
@@ -26,6 +26,7 @@ pl = Polygon([[8, 5], [8, -5], [-8, -5], [-8, 5]])
 struc = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=pl.centroid)
 struc.printTable()
 
+load = XYLoad(x_magnitude=1, y_magnitude=1)
 
-sol = LinSolve(struc, 1, -1)
+sol = LinSolve(struc, load)
 sol.printTable()

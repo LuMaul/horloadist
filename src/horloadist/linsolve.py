@@ -1,7 +1,11 @@
 import pandas as pd
 
-from .node import SupportNode
-from .structure import Stucture
+from horloadist.node import SupportNode
+from horloadist.polygon import Polygon
+from horloadist.structure import Stucture
+from horloadist.loads import XYLoad
+
+import horloadist.converters.to_rfem as rfem_conv
 
 
 class LinSolve:
@@ -47,10 +51,11 @@ class LinSolve:
     _table : pd.DataFrame
         DataFrame containing calculated nodal forces in both directions and torsional effects.
     """  
-    def __init__(self, structure:Stucture, x_mass_force:float=1, y_mass_force:float=1):
+    def __init__(self, structure:Stucture, load:XYLoad):
         self._structure = structure
-        self._x_force = x_mass_force
-        self._y_force = y_mass_force
+        self._load = load
+        self._x_force = self._load._x_magnitude
+        self._y_force = self._load._y_magnitude
 
     @property
     def _eccentricity_x(self):
@@ -158,3 +163,22 @@ class LinSolve:
         for node in self._structure._linnodes:
             node._Rx = -extracVxByNode(node)
             node._Ry = -extracVyByNode(node)
+
+
+    def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+        rfem_conv.init_rfem_model(**rfem_model_kwargs)
+
+        # rfem_conv.Model.clientModel.service.begin_modification()
+
+        for node in self._structure._nodes:
+            rfem_conv.to_rfem_support_node(node=node)
+
+        shell_info = rfem_conv.to_rfem_shell(polygon)
+        shell_tag = list(shell_info)[0]
+
+        glo_x, glo_y = polygon.centroid
+        rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load)
+
+        # rfem_conv.Model.clientModel.service.finish_modification()
+
+        # rfem_conv.Calculate_all()
