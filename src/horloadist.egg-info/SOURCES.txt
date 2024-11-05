@@ -3,6 +3,7 @@ README.md
 pyproject.toml
 src/horloadist/__init__.py
 src/horloadist/linsolve.py
+src/horloadist/loads.py
 src/horloadist/nlsolve.py
 src/horloadist/node.py
 src/horloadist/polygon.py
@@ -14,3 +15,8 @@ src/horloadist.egg-info/SOURCES.txt
 src/horloadist.egg-info/dependency_links.txt
 src/horloadist.egg-info/requires.txt
 src/horloadist.egg-info/top_level.txt
+src/horloadist/converters/to_compas.py
+src/horloadist/converters/to_matplotlib.py
+src/horloadist/converters/to_opensees.py
+src/horloadist/converters/to_plotly.py
+src/horloadist/converters/to_rfem.py
