@@ -111,10 +111,26 @@ struc.printTable()
 sol.printTable()
 ```
 
+## Plot Example
+```python
+# Create structure
+s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
+
+# Define load
+load = XYLoad(x_magnitude=1, y_magnitude=1)
+
+# Solve structure
+ls1 = LinSolve(structure=s1, load=load)
+
+# Convert to matplotlib output
+ls1.to_mpl(poly, save=True, fformat='png')
+```
+![mpl conv example](example_to_mpl.png "mpl convert example")
+
 
 ## Possible Further Improvements
 
-- add plot for geometry and force-vectors
+- implement compas, opensees, plotly converter for geometry and force-vectors
 - add plot for bending stiffnesses imported from csv files
 - add angle param for `KX.globalRectangular(... , angle_from_x : float = ...)`
 - Add a ceiling recess

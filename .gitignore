@@ -3,3 +3,4 @@ __pycache__
 *.pdf
 *.png
 !example_nlsolve_rev.png
+!example_to_mpl.png

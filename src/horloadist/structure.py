@@ -266,16 +266,63 @@ class Stucture:
         # rfem_conv.Calculate_all()
 
 
-    def to_plt(self, polygon:Polygon, name:str='', **suplot_kwargs) -> None:
-        fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
-        plt_conv.get_plt_size(ax, self._glo_node_x, self._glo_node_y, polygon)
+    def to_mpl(
+            self,
+            polygon:Polygon,
+            name:str='',
+            show:bool=True,
+            save:bool=False,
+            fformat:str='pdf',
+            **suplot_kwargs,
+            ) -> tuple[plt_conv.mpl_fig.Figure, plt_conv.mpl_axes.Axes]:
 
-        self.printTable()
-        
+        fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
+        x_rng, y_rng = plt_conv.auto_plt_size(
+            ax,
+            self._glo_node_x,
+            self._glo_node_y,
+            polygon
+            )
+
         plt_conv.to_plt_polygon(ax, polygon)
         
+        stiff_scale = max(x_rng, y_rng) / 15 / max(self._node_EIx.max(), self._node_EIy.max())
+
         for node in self._nodes:
-            plt_conv.to_plt_node(ax, node)
+            plt_conv.to_plt_node(
+                ax,
+                node._glo_x,
+                node._glo_y,
+                str(node._nr),
+                'black',
+                stiff_scale,
+                kx=node._glo_EIy,
+                ky=node._glo_EIx,
+                )
 
+        plt_conv.to_plt_node(
+            ax,
+            self._glo_mass_centre_x,
+            self._glo_mass_centre_y,
+            f'MC ({self._glo_mass_centre_x:0.4f}, {self._glo_mass_centre_y:0.4f})',
+            'green',
+            stiff_scale
+            )
+        
+        plt_conv.to_plt_node(
+            ax,
+            self._glo_stiff_centre_x,
+            self._glo_stiff_centre_y,
+            f'SC ({self._glo_stiff_centre_x:0.4f}, {self._glo_stiff_centre_y:0.4f})',
+            'blue',
+            stiff_scale
+            )
 
-        plt_conv.plt.show()
+        if save:
+            kwargs = {'format':fformat}
+            plt_conv.to_file(**kwargs)
+        
+        if show:
+            plt_conv.plt.show()
+
+        return fig, ax

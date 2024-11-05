@@ -1,4 +1,5 @@
 import pandas as pd
+from typing import Literal
 
 from horloadist.node import SupportNode
 from horloadist.polygon import Polygon
@@ -6,6 +7,7 @@ from horloadist.structure import Stucture
 from horloadist.loads import XYLoad
 
 import horloadist.converters.to_rfem as rfem_conv
+import horloadist.converters.to_matplotlib as plt_conv
 
 
 class LinSolve:
@@ -183,3 +185,70 @@ class LinSolve:
         # rfem_conv.Model.clientModel.service.finish_modification()
 
         # rfem_conv.Calculate_all()
+
+
+    def to_mpl(
+            self,
+            polygon:Polygon,
+            name:str='',
+            show:bool=True,
+            save:bool=False,
+            fformat:str='pdf',
+            forces:Literal['sum', 'torsion', 'transl', 'none']='sum',
+            fscale:float=1,
+            **suplot_kwargs
+            ) -> tuple[plt_conv.mpl_fig.Figure, plt_conv.mpl_axes.Axes]:
+
+        fig, ax = self._structure.to_mpl(polygon, name, show=False, save=False, **suplot_kwargs)
+
+        plt_conv.to_plt_force(
+            ax,
+            self._structure._glo_mass_centre_x,
+            self._structure._glo_mass_centre_y,
+            x_magnitude=self._load._x_magnitude,
+            y_magnitude=self._load._y_magnitude,
+            scale=1/fscale,
+            color='darkred',
+            )
+        
+        if forces == 'sum':
+            plt_conv.to_plt_force(
+                ax,
+                self._structure._glo_node_x,
+                self._structure._glo_node_y,
+                self._node_final_Vx,
+                self._node_final_Vy,
+                scale=1/fscale,
+                color='red'
+            )
+
+        elif forces == 'torsion':
+            plt_conv.to_plt_force(
+                ax,
+                self._structure._glo_node_x,
+                self._structure._glo_node_y,
+                self._node_Ts_from_EIwx,
+                self._node_Ts_from_EIwy,
+                scale=1/fscale,
+                color='red'
+            )
+
+        elif forces == 'transl':
+            plt_conv.to_plt_force(
+                ax,
+                self._structure._glo_node_x,
+                self._structure._glo_node_y,
+                self._node_Vx_from_EIx,
+                self._node_Vy_from_EIy,
+                scale=1/fscale,
+                color='red'
+            )
+
+        if save:
+            kwargs = {'format':fformat}
+            plt_conv.to_file(**kwargs)
+        
+        if show:
+            plt_conv.plt.show()
+
+        return fig, ax

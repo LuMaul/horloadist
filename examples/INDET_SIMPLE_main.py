@@ -18,7 +18,7 @@ w2 = SupportNode(nr=2, glo_x=7.00, glo_y=4.00, glo_kx=kx2, glo_ky=ky2)
 w3 = SupportNode(nr=3, glo_x=6.00, glo_y=5.00, glo_kx=kx3, glo_ky=ky3)
 w4 = SupportNode(nr=4, glo_x=2.00, glo_y=4.00, glo_kx=kx4, glo_ky=ky4)
 
-poly = Polygon([[0, 0], [7, 0], [7, 4], [0, 4]])
+poly = Polygon([[0, 0], [7, 0], [7, 5], [0, 5]])
 
 s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
 
@@ -27,6 +27,7 @@ s1.printTable()
 load = XYLoad(x_magnitude=1, y_magnitude=1)
 
 ls1 = LinSolve(structure=s1, load=load)
+ls1.to_mpl(poly, save=True, fformat='png')
 
 ls1.printTable()
 
@@ -51,3 +52,4 @@ s1.printTable()
 ls1 = LinSolve(structure=s1, load=load)
 
 ls1.printTable()
+

@@ -26,9 +26,9 @@ pl = Polygon([[8, 5], [8, -5], [-8, -5], [-8, 5]])
 struc = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=pl.centroid)
 struc.printTable()
 
-struc.to_plt(pl)
-
 load = XYLoad(x_magnitude=1, y_magnitude=1)
 
 sol = LinSolve(struc, load)
 sol.printTable()
+
+sol.to_mpl(pl, save=True)
