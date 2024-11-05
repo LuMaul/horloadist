@@ -28,4 +28,4 @@ load = XYLoad(y_magnitude=1)
 sol = LinSolve(structure=struc, load=load)
 sol.printTable()
 
-sol.to_mpl(plate, fscale=5, save=True, forces='torsion')
+sol.to_mpl(plate, fscale=5, save=False, forces='torsion')

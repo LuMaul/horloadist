@@ -31,4 +31,4 @@ load = XYLoad(x_magnitude=1, y_magnitude=1)
 sol = LinSolve(struc, load)
 sol.printTable()
 
-sol.to_mpl(pl, save=True)
+sol.to_mpl(pl, save=False)
