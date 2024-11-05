@@ -169,6 +169,31 @@ class LinSolve:
 
 
     def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+        """
+        Convert the current structure to RFEM model format and create corresponding elements.
+        
+        Creates support nodes, shell elements, and free loads in RFEM based on the current
+        structure configuration.
+        
+        Parameters
+        ----------
+        polygon : Polygon
+            The polygon object representing the structure's geometry.
+        **rfem_model_kwargs : dict
+            Additional keyword arguments to pass to the RFEM model initialization.
+            
+        Returns
+        -------
+        None
+        
+        Notes
+        -----
+        This method performs the following operations:
+        1. Initializes the RFEM model
+        2. Creates support nodes for all structure nodes
+        3. Converts the polygon to RFEM shell elements
+        4. Applies free loads at the specified locations
+        """
         rfem_conv.init_rfem_model(**rfem_model_kwargs)
 
         # rfem_conv.Model.clientModel.service.begin_modification()
@@ -198,7 +223,46 @@ class LinSolve:
             fscale:float=1,
             **suplot_kwargs
             ) -> tuple[plt_conv.mpl_fig.Figure, plt_conv.mpl_axes.Axes]:
-
+        """
+        Create a matplotlib visualization of the structure and its forces.
+        
+        Parameters
+        ----------
+        polygon : Polygon
+            The polygon object representing the structure's geometry.
+        name : str, optional
+            Name of the plot, by default ''.
+        show : bool, optional
+            Whether to display the plot, by default True.
+        save : bool, optional
+            Whether to save the plot to a file, by default False.
+        fformat : str, optional
+            File format for saving the plot, by default 'pdf'.
+        forces : {'sum', 'torsion', 'transl', 'none'}, optional
+            Type of forces to display:
+            - 'sum': Show total resultant forces
+            - 'torsion': Show torsional forces
+            - 'transl': Show translational forces
+            - 'none': Don't show forces
+            By default 'sum'.
+        fscale : float, optional
+            Scaling factor for force vectors, by default 1.
+            Larger values make forces appear smaller.
+        **suplot_kwargs : dict
+            Additional keyword arguments to pass to the subplot creation.
+            
+        Returns
+        -------
+        tuple[Figure, Axes]
+            Matplotlib figure and axes objects containing the visualization.
+            
+        Notes
+        -----
+        The visualization includes:
+        - The structure geometry
+        - Force vectors at the mass center (in dark red)
+        - Force vectors at nodes (in red) based on the selected force type
+        """
         fig, ax = self._structure.to_mpl(polygon, name, show=False, save=False, **suplot_kwargs)
 
         plt_conv.to_plt_force(
@@ -208,7 +272,7 @@ class LinSolve:
             x_magnitude=self._load._x_magnitude,
             y_magnitude=self._load._y_magnitude,
             scale=1/fscale,
-            color='darkred',
+            color='blue',
             )
         
         if forces == 'sum':

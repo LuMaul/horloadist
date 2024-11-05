@@ -252,6 +252,30 @@ class Stucture:
         
 
     def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+        """
+        Initializes an RFEM model and converts nodes and polygons to RFEM format.
+
+        Parameters
+        ----------
+        polygon : Polygon
+            A polygon object defining the geometry to be converted to RFEM.
+        **rfem_model_kwargs : dict, optional
+            Additional keyword arguments to initialize the RFEM model. These may include parameters
+            for model setup, boundary conditions, or other RFEM-specific configurations.
+
+        Returns
+        -------
+        None
+            This method does not return a value. It modifies the RFEM model by adding nodes and a shell
+            representation based on the input polygon.
+
+        Notes
+        -----
+        This function initializes the RFEM model using the provided keyword arguments, then iterates
+        over `self._nodes`, converting each node into an RFEM support node. The polygon is added as
+        an RFEM shell. Some additional steps, such as beginning and finishing the RFEM model
+        modification and calculating the model, are currently commented out.
+        """
         rfem_conv.init_rfem_model(**rfem_model_kwargs)
         
         # rfem_conv.Model.clientModel.service.begin_modification()
@@ -275,7 +299,41 @@ class Stucture:
             fformat:str='pdf',
             **suplot_kwargs,
             ) -> tuple[plt_conv.mpl_fig.Figure, plt_conv.mpl_axes.Axes]:
+        """
+        Plots the polygon and node information using Matplotlib.
 
+        Parameters
+        ----------
+        polygon : Polygon
+            A polygon object defining the geometry to be plotted.
+        name : str, optional
+            Title of the plot, used as the figure name. Default is an empty string.
+        show : bool, optional
+            If True, displays the plot. Default is True.
+        save : bool, optional
+            If True, saves the plot to a file. Default is False.
+        fformat : str, optional
+            Format in which to save the file, if `save` is True. Default is 'pdf'.
+        **suplot_kwargs : dict, optional
+            Additional keyword arguments for Matplotlib subplot configuration.
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - fig : plt_conv.mpl_fig.Figure
+                The Matplotlib figure object.
+            - ax : plt_conv.mpl_axes.Axes
+                The Matplotlib axes object.
+
+        Notes
+        -----
+        The function initializes a Matplotlib plot, calculates the scaling factor for stiffness
+        visualization, and then plots each node with respective stiffness values in the x and y
+        directions. Additional nodes for mass center and stiffness center are marked in green and
+        blue, respectively. The plot is saved to a file if `save` is True and displayed if `show`
+        is True.
+        """
         fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
         x_rng, y_rng = plt_conv.auto_plt_size(
             ax,
