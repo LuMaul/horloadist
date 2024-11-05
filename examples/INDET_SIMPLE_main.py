@@ -1,16 +1,16 @@
 from horloadist import KX, KY, Polygon, SupportNode, Stucture, LinSolve, XYLoad
 
-kx1 = KX.constRectangular(dx_glob=3.00, dy_glob=0.30)
-ky1 = KY.constRectangular(dx_glob=3.00, dy_glob=0.30)
+kx1 = KX.constRectangular(glo_dx=3.00, glo_dy=0.30)
+ky1 = KY.constRectangular(glo_dx=3.00, glo_dy=0.30)
 
-kx2 = KX.constRectangular(dx_glob=0.30, dy_glob=2.00)
-ky2 = KY.constRectangular(dx_glob=0.30, dy_glob=2.00)
+kx2 = KX.constRectangular(glo_dx=0.30, glo_dy=2.00)
+ky2 = KY.constRectangular(glo_dx=0.30, glo_dy=2.00)
 
-kx3 = KX.constRectangular(dx_glob=2.00, dy_glob=0.30)
-ky3 = KY.constRectangular(dx_glob=2.00, dy_glob=0.30)
+kx3 = KX.constRectangular(glo_dx=2.00, glo_dy=0.30)
+ky3 = KY.constRectangular(glo_dx=2.00, glo_dy=0.30)
 
-kx4 = KX.constRectangular(dx_glob=0.30, dy_glob=3.00)
-ky4 = KY.constRectangular(dx_glob=0.30, dy_glob=3.00)
+kx4 = KX.constRectangular(glo_dx=0.30, glo_dy=3.00)
+ky4 = KY.constRectangular(glo_dx=0.30, glo_dy=3.00)
 
 
 w1 = SupportNode(nr=1, glo_x=3.50, glo_y=0.00, glo_kx=kx1, glo_ky=ky1)
