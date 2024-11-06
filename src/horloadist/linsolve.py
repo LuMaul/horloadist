@@ -6,6 +6,7 @@ from horloadist.polygon import Polygon
 from horloadist.structure import Stucture
 from horloadist.loads import XYLoad
 
+import horloadist.converters.io_opensees as ops_conv
 import horloadist.converters.io_rfem as rfem_conv
 import horloadist.converters.to_matplotlib as plt_conv
 
@@ -212,7 +213,13 @@ class LinSolve:
         self._result_table['RFEM Vx'] = rfem_conv.from_rfem_XForces(self._structure._node_numbers)
         self._result_table['RFEM Vy'] = rfem_conv.from_rfem_YForces(self._structure._node_numbers)
 
-        
+    
+    def to_ops(self) -> None:
+
+        model, mass_center = self._structure.to_ops()
+        ops_conv.to_ops_load(model, mass_center, self._load)
+
+
 
 
     def to_mpl(

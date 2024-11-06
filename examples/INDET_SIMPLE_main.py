@@ -22,37 +22,41 @@ poly = Polygon([[0, 0], [7, 0], [7, 5], [0, 5]])
 
 s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
 
-s1.printTable()
+# s1.printTable()
 
 load = XYLoad(x_magnitude=1, y_magnitude=1)
 
 ls1 = LinSolve(structure=s1, load=load)
 
-# ls1.to_rfem(poly) # let rfem calculate (windows only)
+# # ls1.to_rfem(poly) # let rfem calculate (windows only)
 
-ls1.to_mpl(poly, save=False, fformat='png')
+ls1.to_ops()
 
-ls1.printTable()
+# # ls1.to_mpl(poly, save=False, fformat='png')
+
+# ls1.printTable()
 
 
-# different coordinate system
 
-print('\n=========== changed coord system ===========\n')
 
-dx, dy = -3.50, -2.00
+# # different coordinate system
 
-poly = Polygon([[0+dx, 0+dy], [7+dx, 0+dy], [7+dx, 5+dy], [0+dx, 5+dy]])
+# print('\n=========== changed coord system ===========\n')
 
-w1 = SupportNode(nr=1, glo_x=3.50+dx, glo_y=0.00+dy, glo_kx=kx1, glo_ky=ky1)
-w2 = SupportNode(nr=2, glo_x=7.00+dx, glo_y=4.00+dy, glo_kx=kx2, glo_ky=ky2)
-w3 = SupportNode(nr=3, glo_x=6.00+dx, glo_y=5.00+dy, glo_kx=kx3, glo_ky=ky3)
-w4 = SupportNode(nr=4, glo_x=2.00+dx, glo_y=4.00+dy, glo_kx=kx4, glo_ky=ky4)
+# dx, dy = -3.50, -2.00
 
-s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
+# poly = Polygon([[0+dx, 0+dy], [7+dx, 0+dy], [7+dx, 5+dy], [0+dx, 5+dy]])
 
-s1.printTable()
+# w1 = SupportNode(nr=1, glo_x=3.50+dx, glo_y=0.00+dy, glo_kx=kx1, glo_ky=ky1)
+# w2 = SupportNode(nr=2, glo_x=7.00+dx, glo_y=4.00+dy, glo_kx=kx2, glo_ky=ky2)
+# w3 = SupportNode(nr=3, glo_x=6.00+dx, glo_y=5.00+dy, glo_kx=kx3, glo_ky=ky3)
+# w4 = SupportNode(nr=4, glo_x=2.00+dx, glo_y=4.00+dy, glo_kx=kx4, glo_ky=ky4)
 
-ls1 = LinSolve(structure=s1, load=load)
+# s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
 
-ls1.printTable()
+# s1.printTable()
+
+# ls1 = LinSolve(structure=s1, load=load)
+
+# ls1.printTable()
 
