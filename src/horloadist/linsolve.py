@@ -60,6 +60,8 @@ class LinSolve:
         self._x_force = self._load._x_magnitude
         self._y_force = self._load._y_magnitude
 
+        self._result_table = self._get_results()
+
     @property
     def _eccentricity_x(self):
         return self._structure._loc_stiff_centre_x
@@ -103,11 +105,10 @@ class LinSolve:
     @property
     def _node_final_Vy(self) -> pd.Series:
         return self._node_Vy_from_EIy + self._node_Ts_from_EIwy
-    
 
-    @property
-    def _table(self) -> pd.DataFrame:
-        
+
+    def _get_results(self) -> pd.DataFrame:
+
         result_table = {
             'node nr':self._structure._node_numbers,
             'Vx ~ EIx':self._node_Vx_from_EIx,
@@ -119,7 +120,8 @@ class LinSolve:
         }
 
         return pd.DataFrame(result_table)
-        
+    
+    
 
     def printTable(self) -> None:
         """
@@ -140,9 +142,9 @@ class LinSolve:
             f"tor. Ts,x  =  Fx * ey   : {self._torsion_Ts_from_x:0.4f}\n"
             f"tor. Ts,y  =  Fy * ex   : {self._torsion_Ts_from_y:0.4f}\n"
             f"tor. Ts = Ts,x + Ts,y   : {self._torsion_Ts :0.4f}\n"
-            f"\n{self._table}\n"
+            f"\n{self._result_table}\n"
             )
-        
+
 
     def updateNodes(self) -> None:
         """
@@ -156,11 +158,11 @@ class LinSolve:
         None
         """
         def extracVxByNode(node:SupportNode) -> float:
-            rx = self._table['Vx'].loc[self._table['node nr'] == node._nr]
+            rx = self._result_table['Vx'].loc[self._result_table['node nr'] == node._nr]
             return float(rx.iloc[0])
         
         def extracVyByNode(node:SupportNode) -> float:
-            ry = self._table['Vy'].loc[self._table['node nr'] == node._nr]
+            ry = self._result_table['Vy'].loc[self._result_table['node nr'] == node._nr]
             return float(ry.iloc[0])
 
         for node in self._structure._linnodes:
@@ -194,22 +196,23 @@ class LinSolve:
         3. Converts the polygon to RFEM shell elements
         4. Applies free loads at the specified locations
         """
-        rfem_conv.init_rfem_model(**rfem_model_kwargs)
-
-        # rfem_conv.Model.clientModel.service.begin_modification()
-
-        for node in self._structure._nodes:
-            rfem_conv.to_rfem_support_node(node=node)
-
-        shell_info = rfem_conv.to_rfem_shell(polygon)
-        shell_tag = list(shell_info)[0]
+        shell_tag = self._structure.to_rfem(
+            polygon=polygon,
+            finish_mod=False,
+            **rfem_model_kwargs
+            )
 
         glo_x, glo_y = polygon.centroid
         rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load)
 
-        # rfem_conv.Model.clientModel.service.finish_modification()
+        rfem_conv.Model.clientModel.service.finish_modification()
 
-        # rfem_conv.Calculate_all()
+        rfem_conv.Calculate_all()
+
+        self._result_table['RFEM Vx'] = rfem_conv.from_rfem_XForces(self._structure._node_numbers)
+        self._result_table['RFEM Vy'] = rfem_conv.from_rfem_YForces(self._structure._node_numbers)
+
+        
 
 
     def to_mpl(

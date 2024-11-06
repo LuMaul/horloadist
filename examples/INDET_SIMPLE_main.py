@@ -27,6 +27,9 @@ s1.printTable()
 load = XYLoad(x_magnitude=1, y_magnitude=1)
 
 ls1 = LinSolve(structure=s1, load=load)
+
+# ls1.to_rfem(poly) # let rfem calculate (windows only)
+
 ls1.to_mpl(poly, save=False, fformat='png')
 
 ls1.printTable()
@@ -38,7 +41,7 @@ print('\n=========== changed coord system ===========\n')
 
 dx, dy = -3.50, -2.00
 
-poly = Polygon([[0+dx, 0+dy], [7+dx, 0+dy], [7+dx, 4+dy], [0+dx, 4+dy]])
+poly = Polygon([[0+dx, 0+dy], [7+dx, 0+dy], [7+dx, 5+dy], [0+dx, 5+dy]])
 
 w1 = SupportNode(nr=1, glo_x=3.50+dx, glo_y=0.00+dy, glo_kx=kx1, glo_ky=ky1)
 w2 = SupportNode(nr=2, glo_x=7.00+dx, glo_y=4.00+dy, glo_kx=kx2, glo_ky=ky2)

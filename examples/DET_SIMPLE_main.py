@@ -19,13 +19,14 @@ struc = Stucture(nodes=[n1, n2, n3], glo_mass_centre=(2.50, 2.50))
 
 poly = Polygon(glob_xy=[[0, 0], [5, 0], [5, 5], [0, 5]])
 
-# struc.to_rfem(poly, connect_to_server=False)
-
 struc.printTable()
 
 load = XYLoad(x_magnitude=1.00)
 
 sol = LinSolve(structure=struc, load=load)
+
+# sol.to_rfem(poly) # let rfem calculate (windows only)
+
 sol.printTable()
 
 sol.to_mpl(poly, fscale=1, save=False, forces='torsion')

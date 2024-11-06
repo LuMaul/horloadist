@@ -251,7 +251,7 @@ class Stucture:
             )
         
 
-    def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+    def to_rfem(self, polygon:Polygon, finish_mod=True, **rfem_model_kwargs) -> int:
         """
         Initializes an RFEM model and converts nodes and polygons to RFEM format.
 
@@ -278,16 +278,18 @@ class Stucture:
         """
         rfem_conv.init_rfem_model(**rfem_model_kwargs)
         
-        # rfem_conv.Model.clientModel.service.begin_modification()
+        rfem_conv.Model.clientModel.service.begin_modification()
 
         for node in self._nodes:
             rfem_conv.to_rfem_support_node(node=node)
 
-        rfem_conv.to_rfem_shell(polygon)
+        shell_tag = rfem_conv.to_rfem_shell(polygon)
 
-        # rfem_conv.Model.clientModel.service.finish_modification()
+        if finish_mod:        
+            rfem_conv.Model.clientModel.service.finish_modification()
 
-        # rfem_conv.Calculate_all()
+        return shell_tag
+
 
 
     def to_mpl(
