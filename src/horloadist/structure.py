@@ -8,6 +8,7 @@ from horloadist.stiffnesses import KX, KY
 from horloadist.node import SupportNode
 from horloadist.utils import interpolateXY
 
+import horloadist.converters.io_opensees as ops_conv
 import horloadist.converters.io_rfem as rfem_conv
 import horloadist.converters.to_matplotlib as plt_conv
 
@@ -258,23 +259,31 @@ class Stucture:
         Parameters
         ----------
         polygon : Polygon
-            A polygon object defining the geometry to be converted to RFEM.
+            A polygon object defining the geometry to be converted to RFEM, which will be 
+            represented as a shell element in RFEM.
+        finish_mod : bool, optional
+            A flag to control whether to finalize the RFEM model modification after 
+            adding nodes and the shell. If True, the modification is finished. 
+            Default is True.
         **rfem_model_kwargs : dict, optional
-            Additional keyword arguments to initialize the RFEM model. These may include parameters
-            for model setup, boundary conditions, or other RFEM-specific configurations.
+            Additional keyword arguments for initializing the RFEM model. These may 
+            include parameters for model setup, boundary conditions, or other 
+            RFEM-specific configurations.
 
         Returns
         -------
-        None
-            This method does not return a value. It modifies the RFEM model by adding nodes and a shell
-            representation based on the input polygon.
+        int
+            An integer tag identifying the shell representation of the input polygon 
+            in the RFEM model.
 
         Notes
         -----
-        This function initializes the RFEM model using the provided keyword arguments, then iterates
-        over `self._nodes`, converting each node into an RFEM support node. The polygon is added as
-        an RFEM shell. Some additional steps, such as beginning and finishing the RFEM model
-        modification and calculating the model, are currently commented out.
+        This function begins by initializing an RFEM model with the given keyword arguments. 
+        It then iterates over `self._nodes`, converting each node into an RFEM support node. 
+        The input `polygon` is added to the model as an RFEM shell, and a tag for this 
+        shell is returned. If `finish_mod` is set to True, the modification to the RFEM 
+        model is finalized. Some additional steps, such as calculating the model, are 
+        currently commented out.
         """
         rfem_conv.init_rfem_model(**rfem_model_kwargs)
         
@@ -289,6 +298,20 @@ class Stucture:
             rfem_conv.Model.clientModel.service.finish_modification()
 
         return shell_tag
+    
+
+    def to_ops(self, **ops_mod_kwargs) -> tuple:
+        model = ops_conv.init_ops_model(**ops_mod_kwargs)
+
+        model, mass_center = ops_conv.to_ops_spider(
+            model=model,
+            support_nodes=self._nodes,
+            mass_centre_x=self._glo_mass_centre_x,
+            mass_centre_y=self._glo_mass_centre_y,
+            )
+        
+        return model, mass_center
+        
 
 
 
