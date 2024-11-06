@@ -8,7 +8,7 @@ from horloadist.stiffnesses import KX, KY
 from horloadist.node import SupportNode
 from horloadist.utils import interpolateXY
 
-import horloadist.converters.to_rfem as rfem_conv
+import horloadist.converters.io_rfem as rfem_conv
 import horloadist.converters.to_matplotlib as plt_conv
 
 

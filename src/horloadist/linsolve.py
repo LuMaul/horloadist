@@ -6,7 +6,7 @@ from horloadist.polygon import Polygon
 from horloadist.structure import Stucture
 from horloadist.loads import XYLoad
 
-import horloadist.converters.to_rfem as rfem_conv
+import horloadist.converters.io_rfem as rfem_conv
 import horloadist.converters.to_matplotlib as plt_conv
 
 
