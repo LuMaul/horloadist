@@ -1,4 +1,4 @@
-from horloadist import KX, KY, SupportNode, Polygon, Polygons, Stucture
+from horloadist import KX, KY, SupportNode, Polygon, Polygons, Stucture, XYLoad, LinSolve
 
 kx1 = KX.constRectangular(glo_dx=5.26, glo_dy=0.20)
 ky1 = KY.constRectangular(glo_dx=5.26, glo_dy=0.20)
@@ -25,14 +25,33 @@ w6 = SupportNode(nr=6, glo_x=11.490, glo_y= 6.070, glo_kx=kx6_7, glo_ky=ky6_7)
 w7 = SupportNode(nr=7, glo_x=11.490, glo_y= 9.470, glo_kx=kx6_7, glo_ky=ky6_7)
 
 # shell
-pos_poly1 = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
-# recesses
+pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
+
+# openings
 neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
 neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
 
-tot_polygon = Polygons(pos_polygons=[pos_poly1], neg_polygons=[neg_poly1, neg_poly2])
+# all polygons together
+tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
+
+struc = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=tot_polygon.centroid)
+
+loadcase_x  = XYLoad(x_magnitude=1, y_magnitude=0)
+loadcase_y  = XYLoad(x_magnitude=0, y_magnitude=1)
+loadcase_xy = XYLoad(x_magnitude=1, y_magnitude=1)
+
+for lc in [loadcase_x, loadcase_y, loadcase_xy]:
+
+    sol = LinSolve(structure=struc, load=lc)
+    
+    for dir in ['sum', 'torsion', 'transl']:
+        fname = f'{dir} fx {lc._x_magnitude} fy {lc._y_magnitude}'
+        sol.to_mpl(polygon=tot_polygon, fname=fname, show=False, save=True)
+
+# show and calculate in RFEM
+sol.to_rfem(polygon=tot_polygon)
+
+# print results from Python and RFEM
+sol.printTable()
 
 
-s1 = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=tot_polygon.centroid)
-
-s1.to_mpl(polygon=tot_polygon)
