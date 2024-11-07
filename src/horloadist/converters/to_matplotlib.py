@@ -10,7 +10,7 @@ import matplotlib.figure as mpl_fig
 import matplotlib.patches as mpl_patches
 
 from horloadist.node import SupportNode
-from horloadist.polygon import Polygon
+from horloadist.polygon import Polygon, Polygons
 
 NODE_STIFF_LEN = 1.00
 
@@ -41,7 +41,7 @@ STIFF_LINE_STYLING = {
 
 
 POLYGON_STYLING = {
-    'color':'black',
+    'ec':'black',
     'fc':'lightgray',
     'alpha':0.3,
     'zorder':0,
