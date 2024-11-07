@@ -3,7 +3,7 @@ import numpy as np
 from copy import deepcopy
 
 
-from horloadist.polygon import Polygon
+from horloadist.polygon import Polygon, Polygons
 from horloadist.stiffnesses import KX, KY
 from horloadist.node import SupportNode
 from horloadist.utils import interpolateXY
@@ -317,7 +317,7 @@ class Stucture:
 
     def to_mpl(
             self,
-            polygon:Polygon,
+            polygon:Polygon|Polygons,
             name:str='',
             show:bool=True,
             save:bool=False,
@@ -360,14 +360,30 @@ class Stucture:
         is True.
         """
         fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
-        x_rng, y_rng = plt_conv.auto_plt_size(
-            ax,
-            self._glo_node_x,
-            self._glo_node_y,
-            polygon
-            )
 
-        plt_conv.to_plt_polygon(ax, polygon)
+        if isinstance(polygon, Polygon):
+            plt_conv.to_plt_polygon(ax, polygon)
+            x_rng, y_rng = plt_conv.auto_plt_size(
+                ax,
+                self._glo_node_x,
+                self._glo_node_y,
+                polygon
+                ) # make better
+
+        if isinstance(polygon, Polygons):
+            for pos_polygon in polygon._pos_polygons:
+                plt_conv.to_plt_polygon(ax, pos_polygon)
+                x_rng, y_rng = plt_conv.auto_plt_size(
+                    ax,
+                    self._glo_node_x,
+                    self._glo_node_y,
+                    pos_polygon
+                    ) # make better
+
+            for neg_polygon in polygon._neg_polygons:
+                plt_conv.POLYGON_STYLING['fc'] = 'white'
+                plt_conv.to_plt_polygon(ax, neg_polygon)
+
         
         stiff_scale = max(x_rng, y_rng) / 15 / max(self._node_EIx.max(), self._node_EIy.max())
 
