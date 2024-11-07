@@ -252,7 +252,7 @@ class Stucture:
             )
         
 
-    def to_rfem(self, polygon:Polygon, finish_mod=True, **rfem_model_kwargs) -> int:
+    def to_rfem(self, polygon:Polygon|Polygons, finish_mod=True, **rfem_model_kwargs) -> int:
         """
         Initializes an RFEM model and converts nodes and polygons to RFEM format.
 
@@ -292,7 +292,13 @@ class Stucture:
         for node in self._nodes:
             rfem_conv.to_rfem_support_node(node=node)
 
-        shell_tag = rfem_conv.to_rfem_shell(polygon)
+        if isinstance(polygon, Polygon):
+            shell_tag = rfem_conv.to_rfem_shell(polygon)
+        
+        if isinstance(polygon, Polygons):
+            shell_tag = rfem_conv.to_rfem_shell(polygon._pos_polygon)
+            for neg_polygon in polygon._neg_polygons:
+                rfem_conv.to_rfem_opening(neg_polygon)
 
         if finish_mod:        
             rfem_conv.Model.clientModel.service.finish_modification()
@@ -318,7 +324,7 @@ class Stucture:
     def to_mpl(
             self,
             polygon:Polygon|Polygons,
-            name:str='',
+            fname:str='',
             show:bool=True,
             save:bool=False,
             fformat:str='pdf',
@@ -359,30 +365,32 @@ class Stucture:
         blue, respectively. The plot is saved to a file if `save` is True and displayed if `show`
         is True.
         """
-        fig, ax = plt_conv.init_plt(name=name, **suplot_kwargs)
+        fig, ax = plt_conv.init_plt(name=fname, **suplot_kwargs)
 
         if isinstance(polygon, Polygon):
-            plt_conv.to_plt_polygon(ax, polygon)
-            x_rng, y_rng = plt_conv.auto_plt_size(
-                ax,
-                self._glo_node_x,
-                self._glo_node_y,
-                polygon
-                ) # make better
-
+            pos_polygon = polygon
+        
         if isinstance(polygon, Polygons):
-            for pos_polygon in polygon._pos_polygons:
-                plt_conv.to_plt_polygon(ax, pos_polygon)
-                x_rng, y_rng = plt_conv.auto_plt_size(
-                    ax,
-                    self._glo_node_x,
-                    self._glo_node_y,
-                    pos_polygon
-                    ) # make better
+            pos_polygon = polygon._pos_polygon
+
+            plt_conv.POLYGON_STYLING['fc'] = 'white'
+            plt_conv.POLYGON_STYLING['zorder'] = 1
 
             for neg_polygon in polygon._neg_polygons:
-                plt_conv.POLYGON_STYLING['fc'] = 'white'
                 plt_conv.to_plt_polygon(ax, neg_polygon)
+
+
+        plt_conv.POLYGON_STYLING['fc'] = 'lightgray'
+        plt_conv.POLYGON_STYLING['zorder'] = 0
+
+        plt_conv.to_plt_polygon(ax, pos_polygon)
+        x_rng, y_rng = plt_conv.auto_plt_size(
+            ax,
+            self._glo_node_x,
+            self._glo_node_y,
+            pos_polygon
+            )
+        
 
         
         stiff_scale = max(x_rng, y_rng) / 15 / max(self._node_EIx.max(), self._node_EIy.max())
@@ -418,7 +426,7 @@ class Stucture:
             )
 
         if save:
-            kwargs = {'format':fformat}
+            kwargs = {'fname':f'{fname}.{fformat}'}
             plt_conv.to_file(**kwargs)
         
         if show:
