@@ -123,6 +123,8 @@ dependencies = [
   "pandas",
   "scipy",
   "matplotlib",
+  "o3seespy",
+  "RFEM"
 ]
 
 # List additional groups of dependencies here (e.g. development
