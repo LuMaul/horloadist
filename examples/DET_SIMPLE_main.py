@@ -29,4 +29,4 @@ sol = LinSolve(structure=struc, load=load)
 
 sol.printTable()
 
-sol.to_mpl(poly, fscale=1, save=False, forces='torsion')
+sol.to_mpl(poly, f_disp_scale=1, save=False, forces='torsion')
