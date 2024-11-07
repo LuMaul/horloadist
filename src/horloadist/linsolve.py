@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Literal
 
 from horloadist.node import SupportNode
-from horloadist.polygon import Polygon
+from horloadist.polygon import Polygon, Polygons
 from horloadist.structure import Stucture
 from horloadist.loads import XYLoad
 
@@ -171,7 +171,7 @@ class LinSolve:
             node._Ry = -extracVyByNode(node)
 
 
-    def to_rfem(self, polygon:Polygon, **rfem_model_kwargs) -> None:
+    def to_rfem(self, polygon:Polygon|Polygons, **rfem_model_kwargs) -> None:
         """
         Convert the current structure to RFEM model format and create corresponding elements.
         
@@ -204,14 +204,22 @@ class LinSolve:
             )
 
         glo_x, glo_y = polygon.centroid
-        rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load)
+        
+        loadcase_no = rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load)
 
         rfem_conv.Model.clientModel.service.finish_modification()
 
         rfem_conv.Calculate_all()
 
-        self._result_table['RFEM Vx'] = rfem_conv.from_rfem_XForces(self._structure._node_numbers)
-        self._result_table['RFEM Vy'] = rfem_conv.from_rfem_YForces(self._structure._node_numbers)
+        self._result_table['RFEM Vx'] = rfem_conv.from_rfem_XForces(
+            self._structure._node_numbers,
+            loadcase_no=loadcase_no
+            )
+        
+        self._result_table['RFEM Vy'] = rfem_conv.from_rfem_YForces(
+            self._structure._node_numbers,
+            loadcase_no=loadcase_no
+            )
 
     
     def to_ops(self) -> None:
@@ -224,13 +232,13 @@ class LinSolve:
 
     def to_mpl(
             self,
-            polygon:Polygon,
-            name:str='',
+            polygon:Polygon|Polygons,
+            fname:str='',
             show:bool=True,
             save:bool=False,
             fformat:str='pdf',
             forces:Literal['sum', 'torsion', 'transl', 'none']='sum',
-            fscale:float=1,
+            f_disp_scale:float=1,
             **suplot_kwargs
             ) -> tuple[plt_conv.mpl_fig.Figure, plt_conv.mpl_axes.Axes]:
         """
@@ -273,7 +281,7 @@ class LinSolve:
         - Force vectors at the mass center (in dark red)
         - Force vectors at nodes (in red) based on the selected force type
         """
-        fig, ax = self._structure.to_mpl(polygon, name, show=False, save=False, **suplot_kwargs)
+        fig, ax = self._structure.to_mpl(polygon, fname, show=False, save=False, **suplot_kwargs)
 
         plt_conv.to_plt_force(
             ax,
@@ -281,7 +289,7 @@ class LinSolve:
             self._structure._glo_mass_centre_y,
             x_magnitude=self._load._x_magnitude,
             y_magnitude=self._load._y_magnitude,
-            scale=1/fscale,
+            scale=1/f_disp_scale,
             color='blue',
             )
         
@@ -292,7 +300,7 @@ class LinSolve:
                 self._structure._glo_node_y,
                 self._node_final_Vx,
                 self._node_final_Vy,
-                scale=1/fscale,
+                scale=1/f_disp_scale,
                 color='red'
             )
 
@@ -303,7 +311,7 @@ class LinSolve:
                 self._structure._glo_node_y,
                 self._node_Ts_from_EIwx,
                 self._node_Ts_from_EIwy,
-                scale=1/fscale,
+                scale=1/f_disp_scale,
                 color='red'
             )
 
@@ -314,12 +322,12 @@ class LinSolve:
                 self._structure._glo_node_y,
                 self._node_Vx_from_EIx,
                 self._node_Vy_from_EIy,
-                scale=1/fscale,
+                scale=1/f_disp_scale,
                 color='red'
             )
 
         if save:
-            kwargs = {'format':fformat}
+            kwargs = {'fname':f'{fname}.{fformat}'}
             plt_conv.to_file(**kwargs)
         
         if show:
