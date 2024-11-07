@@ -55,3 +55,62 @@ class Polygon:
         statical_moments = np.sum(tri_areas[:, np.newaxis] * tri_centr, axis=0)
         centroid = statical_moments / self.area
         return centroid
+    
+
+class Polygons:
+    """
+    Represents a collection of positive and negative polygons.
+
+    Attributes
+    ----------
+    _pos_polygons : list[Polygon]
+        List of positive polygons.
+    _neg_polygons : list[Polygon]
+        List of negative polygons. E.g. a shell recess.
+
+    Methods
+    -------
+    centroid() -> tuple[float, float]
+        Calculates the overall centroid of the positive and negative polygons.
+
+    _stat_moment(polygon: Polygon) -> np.ndarray
+        Calculates the statistical moment (area * centroid) for a single polygon.
+
+    Examples
+    --------
+    >>> pos_polygons = [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+                    Polygon([[2, 0], [3, 0], [3, 2], [2, 2]])]
+    >>> neg_polygons = [Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
+    >>> polygons = Polygons(pos_polygons, neg_polygons)
+    >>> print(polygons.centroid)
+    (1.0, 1.0)
+    """
+    def __init__(
+            self,
+            pos_polygons:list[Polygon],
+            neg_polygons:list[Polygon]=[]
+            ):
+
+        self._pos_polygons = pos_polygons
+        self._neg_polygons = neg_polygons
+
+
+    @property
+    def centroid(self) -> tuple[float, float]:
+
+        tot_stat_moment = np.array([0.00, 0.00])
+        tot_poly_area = 0.00
+        for pos_polygon in self._pos_polygons:
+            tot_stat_moment += self._stat_moment(pos_polygon)
+            tot_poly_area += pos_polygon.area
+        
+        for neg_polygon in self._neg_polygons:
+            tot_stat_moment -= self._stat_moment(neg_polygon)
+            tot_poly_area -= neg_polygon.area
+
+        x, y = 1/tot_poly_area * tot_stat_moment
+
+        return x, y
+    
+    def _stat_moment(self, polygon:Polygon) -> np.ndarray:
+        return polygon.area * np.array(polygon.centroid)
