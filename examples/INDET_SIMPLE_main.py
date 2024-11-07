@@ -28,13 +28,13 @@ load = XYLoad(x_magnitude=1, y_magnitude=1)
 
 ls1 = LinSolve(structure=s1, load=load)
 
-# # ls1.to_rfem(poly) # let rfem calculate (windows only)
+# ls1.to_rfem(poly) # let rfem calculate (windows only)
 
 ls1.to_ops()
 
 # # ls1.to_mpl(poly, save=False, fformat='png')
 
-# ls1.printTable()
+ls1.printTable()
 
 
 
