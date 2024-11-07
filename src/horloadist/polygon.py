@@ -59,50 +59,67 @@ class Polygon:
 
 class Polygons:
     """
-    Represents a collection of positive and negative polygons.
+    Represents a collection of positive and negative polygons, which together 
+    define a composite shape with an overall centroid.
 
     Attributes
     ----------
-    _pos_polygons : list[Polygon]
-        List of positive polygons.
+    _pos_polygon : Polygon
+        The primary positive polygon.
     _neg_polygons : list[Polygon]
-        List of negative polygons. E.g. a shell recess.
+        A list of negative polygons that represent areas to subtract from 
+        the positive polygon, e.g., holes or recesses.
 
     Methods
     -------
+    __init__(pos_polygon: Polygon, neg_polygons: list[Polygon] = [])
+        Initializes the Polygons object with a primary positive polygon and 
+        optional negative polygons.
+
     centroid() -> tuple[float, float]
-        Calculates the overall centroid of the positive and negative polygons.
+        Calculates the overall centroid of the composite shape, taking into 
+        account both positive and negative polygons.
 
     _stat_moment(polygon: Polygon) -> np.ndarray
-        Calculates the statistical moment (area * centroid) for a single polygon.
+        Calculates the statistical moment (area * centroid) for a single 
+        polygon. Positive polygons add to the moment, while negative polygons 
+        subtract from it.
 
     Examples
     --------
-    >>> pos_polygons = [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-                    Polygon([[2, 0], [3, 0], [3, 2], [2, 2]])]
-    >>> neg_polygons = [Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
-    >>> polygons = Polygons(pos_polygons, neg_polygons)
+    >>> pos_polygon = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    >>> neg_polygons = [Polygon([[0.5, 0.5], [0.75, 0.5], [0.75, 0.75], [0.5, 0.75]])]
+    >>> polygons = Polygons(pos_polygon, neg_polygons)
     >>> print(polygons.centroid)
-    (1.0, 1.0)
+    (0.5, 0.5)
     """
     def __init__(
             self,
-            pos_polygons:list[Polygon],
+            pos_polygon:Polygon,
             neg_polygons:list[Polygon]=[]
             ):
 
-        self._pos_polygons = pos_polygons
+        self._pos_polygon = pos_polygon
         self._neg_polygons = neg_polygons
 
 
     @property
     def centroid(self) -> tuple[float, float]:
+        """
+        Computes the centroid of the composite shape formed by the positive 
+        polygon and the negative polygons. The centroid is calculated based on 
+        the statical moments of all polygons.
 
+        Returns
+        -------
+        tuple[float, float]
+            The (x, y) coordinates of the composite centroid.
+        """
         tot_stat_moment = np.array([0.00, 0.00])
         tot_poly_area = 0.00
-        for pos_polygon in self._pos_polygons:
-            tot_stat_moment += self._stat_moment(pos_polygon)
-            tot_poly_area += pos_polygon.area
+
+        tot_stat_moment += self._stat_moment(self._pos_polygon)
+        tot_poly_area += self._pos_polygon.area
         
         for neg_polygon in self._neg_polygons:
             tot_stat_moment -= self._stat_moment(neg_polygon)
