@@ -7,7 +7,7 @@ class KX:
         return E_mod * kx
 
     @staticmethod
-    def constRectangular(glo_dx:float, glo_dy:float, E_mod:float=1) -> float:
+    def constRectangular(glo_dx:float, glo_dy:float, E_mod:float=1.00) -> float:
         return E_mod * glo_dy * glo_dx**3 / 12 #EIy
     
     @staticmethod
@@ -23,7 +23,7 @@ class KY:
         return kx
 
     @staticmethod
-    def constRectangular(glo_dx:float, glo_dy:float, E_mod:float=1) -> float:
+    def constRectangular(glo_dx:float, glo_dy:float, E_mod:float=1.00) -> float:
         return E_mod * glo_dx * glo_dy**3 / 12 #EIx
     
     @staticmethod
