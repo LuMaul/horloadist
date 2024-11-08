@@ -204,5 +204,6 @@ def to_plt_force(
 
 
 def to_file(**kwargs) -> None:
+    kwargs.setdefault('format', 'pdf')
     kwargs.setdefault('fname', f'{os.path.basename(__main__.__file__)}.{kwargs['format']}')
     plt.savefig(**kwargs)
