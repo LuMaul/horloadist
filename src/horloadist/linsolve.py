@@ -1,10 +1,10 @@
 import pandas as pd
 from typing import Literal
 
-from horloadist.node import SupportNode
+from horloadist.node import XYSupportNode, ZSupportNode
 from horloadist.polygon import Polygon, Polygons
 from horloadist.structure import Stucture
-from horloadist.loads import XYLoad
+from horloadist.loads import Load
 
 import horloadist.converters.io_opensees as ops_conv
 import horloadist.converters.io_rfem as rfem_conv
@@ -55,9 +55,9 @@ class LinSolve:
     _table : pd.DataFrame
         DataFrame containing all calculated nodal forces, including torsional effects.
     """ 
-    def __init__(self, structure:Stucture, load:XYLoad):
-        self._structure = structure
-        self._load = load
+    def __init__(self, xy_structure:Stucture, xy_load:Load):
+        self._structure = xy_structure
+        self._load = xy_load
         self._x_force = self._load._x_magnitude
         self._y_force = self._load._y_magnitude
 
@@ -158,11 +158,11 @@ class LinSolve:
         -------
         None
         """
-        def extracVxByNode(node:SupportNode) -> float:
+        def extracVxByNode(node:XYSupportNode) -> float:
             rx = self._result_table['Vx'].loc[self._result_table['node nr'] == node._nr]
             return float(rx.iloc[0])
         
-        def extracVyByNode(node:SupportNode) -> float:
+        def extracVyByNode(node:XYSupportNode) -> float:
             ry = self._result_table['Vy'].loc[self._result_table['node nr'] == node._nr]
             return float(ry.iloc[0])
 
@@ -171,7 +171,11 @@ class LinSolve:
             node._Ry = -extracVyByNode(node)
 
 
-    def to_rfem(self, polygon:Polygon|Polygons, **rfem_model_kwargs) -> None:
+    def to_rfem(self,
+                polygon:Polygon|Polygons,
+                z_nodes:list[ZSupportNode]=[],
+                z_load_magnitude:float|None=None,
+                **rfem_model_kwargs) -> pd.DataFrame:
         """
         Convert the current structure to RFEM model format and create corresponding elements.
         
@@ -199,29 +203,42 @@ class LinSolve:
         """
         shell_tag = self._structure.to_rfem(
             polygon=polygon,
+            z_nodes=z_nodes,
             finish_mod=False,
             **rfem_model_kwargs
             )
-
+        
         glo_x, glo_y = polygon.centroid
         
-        loadcase_no = rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load)
+        loadcase_no = rfem_conv.to_rfem_free_load(glo_x, glo_y, shell_tag, self._load, z_load_magnitude)
 
         rfem_conv.Model.clientModel.service.finish_modification()
 
         rfem_conv.Calculate_all()
 
-        self._result_table['RFEM Vx'] = rfem_conv.from_rfem_XForces(
+        
+        self._node_final_rfem_Vx = rfem_conv.from_rfem_XForces(
             self._structure._node_numbers,
             loadcase_no=loadcase_no
             )
         
-        self._result_table['RFEM Vy'] = rfem_conv.from_rfem_YForces(
+        self._node_final_rfem_Vy = rfem_conv.from_rfem_YForces(
             self._structure._node_numbers,
             loadcase_no=loadcase_no
             )
+        
+        self._node_final_rfem_Vz = rfem_conv.from_rfem_ZForces(
+            self._structure._node_numbers,
+            loadcase_no=loadcase_no
+            )
+        
+        self._result_table['RFEM Vx'] = self._node_final_rfem_Vx
+        self._result_table['RFEM Vy'] = self._node_final_rfem_Vy
+        self._result_table['RFEM Vz'] = self._node_final_rfem_Vz
+        
+        return self._result_table
 
-    
+
     def to_ops(self) -> None:
 
         model, mass_center = self._structure.to_ops()
@@ -334,3 +351,10 @@ class LinSolve:
             plt_conv.plt.show()
 
         return fig, ax
+    
+
+class ZLinSolve:
+    def __init__(self, xy_structure:Stucture, z_nodes:list[ZSupportNode]) -> None:
+        self._xy_structure = xy_structure
+        self._z_nodes = z_nodes
+        pass

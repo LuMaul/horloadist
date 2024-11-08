@@ -1,4 +1,4 @@
-from horloadist import KX, KY, SupportNode, Polygon, Stucture, NonLinSolve, XYLoad
+from horloadist import KX, KY, XYSupportNode, Polygon, Stucture, NonLinSolve, Load
 from horloadist.utils import plot_nlsolve
 
 import os
@@ -17,17 +17,17 @@ ky10 = KX.from_csv(constrPth('10 mchi csa N-49.9 kN.csv'), 'mom', 'EI')
 kx11 = KY.from_csv(constrPth('10 mchi csa N-49.9 kN.csv'), 'mom', 'EI')
 
 
-w7 = SupportNode(7, 0.125, 1, 0, ky7)
-w8 = SupportNode(8, 2.875, 1, 0, ky8)
-w9 = SupportNode(9, 4, 2.125, kx9, 0)
-w10 = SupportNode(10, 6.875, 3.5, 0, ky10)
-w11 = SupportNode(11, 1.5, 4.875, kx11, 0)
+w7 = XYSupportNode(7, 0.125, 1, 0, ky7)
+w8 = XYSupportNode(8, 2.875, 1, 0, ky8)
+w9 = XYSupportNode(9, 4, 2.125, kx9, 0)
+w10 = XYSupportNode(10, 6.875, 3.5, 0, ky10)
+w11 = XYSupportNode(11, 1.5, 4.875, kx11, 0)
 
 shell = Polygon(glob_xy=[[0, 0], [3, 0], [3, 2], [7, 2], [7, 5], [0, 5]])
 
-struc = Stucture(nodes=[w7, w8, w9, w10, w11], glo_mass_centre=shell.centroid, verbose=False)
+struc = Stucture(xynodes=[w7, w8, w9, w10, w11], glo_mass_centre=shell.centroid, verbose=False)
 
-load = XYLoad(x_magnitude=1000, y_magnitude=1000)
+load = Load(x_magnitude=1000, y_magnitude=1000)
 
 sol = NonLinSolve(struc, load, z_heigt=5)
 

@@ -9,7 +9,7 @@ import matplotlib.axes as mpl_axes
 import matplotlib.figure as mpl_fig
 import matplotlib.patches as mpl_patches
 
-from horloadist.node import SupportNode
+from horloadist.node import XYSupportNode
 from horloadist.polygon import Polygon, Polygons
 
 NODE_STIFF_LEN = 1.00

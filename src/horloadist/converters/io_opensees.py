@@ -1,8 +1,8 @@
 # not implemented yet
 import o3seespy as o3
 
-from horloadist.node import SupportNode
-from horloadist.loads import XYLoad
+from horloadist.node import XYSupportNode
+from horloadist.loads import Load
 
 def init_ops_model(**model_kwargs) ->  o3.OpenSeesInstance:
     model_kwargs.setdefault('ndm', 2)
@@ -17,7 +17,7 @@ def to_ops_node(model:o3.OpenSeesInstance, x:float, y:float) -> o3.node.Node:
 
 def to_ops_support(
         model:o3.OpenSeesInstance,
-        node:SupportNode,
+        node:XYSupportNode,
         ) -> o3.node.Node:
     
     fixed_node = to_ops_node(model=model, x=node._glo_x, y=node._glo_y)
@@ -78,7 +78,7 @@ def to_ops_rigid_beam(
 
 def to_ops_spider(
         model:o3.OpenSeesInstance,
-        support_nodes:list[SupportNode],
+        support_nodes:list[XYSupportNode],
         mass_centre_x:float,
         mass_centre_y:float
         ) -> o3.node.Node:
@@ -95,7 +95,7 @@ def to_ops_spider(
 def to_ops_load(
         model:o3.OpenSeesInstance,
         mass_center:o3.node.Node,
-        load:XYLoad
+        load:Load
         ) -> None:
 
     timesrs = o3.time_series.Constant(model)
@@ -120,10 +120,10 @@ def to_ops_load(
 if __name__ == '__main__':
     mod = init_ops_model()
 
-    snode1 = SupportNode(nr=0, glo_x=0.00, glo_y=0.00, glo_kx=1.0, glo_ky=1.0)
-    snode2 = SupportNode(nr=0, glo_x=5.00, glo_y=0.00, glo_kx=1.0, glo_ky=1.0)
+    snode1 = XYSupportNode(nr=0, glo_x=0.00, glo_y=0.00, glo_kx=1.0, glo_ky=1.0)
+    snode2 = XYSupportNode(nr=0, glo_x=5.00, glo_y=0.00, glo_kx=1.0, glo_ky=1.0)
 
-    load = XYLoad(0.00, -1000.0)
+    load = Load(0.00, -1000.0)
 
     mass_center_node = to_ops_node(mod, x=2.50, y=0.00)
 

@@ -3,7 +3,7 @@ import pandas as pd
 from .stiffnesses import KX, KY
 
 
-class SupportNode:
+class XYSupportNode:
     """
     A class to represent a support node in a structural system.
 
@@ -54,3 +54,16 @@ class SupportNode:
         # updated via Solvers
         self._Rx = 0.0
         self._Ry = 0.0
+
+
+class ZSupportNode:
+    def __init__(
+            self,
+            nr:int,
+            glo_x:float,
+            glo_y:float,
+            ):
+        
+        self._nr = nr
+        self._glo_x = glo_x
+        self._glo_y = glo_y

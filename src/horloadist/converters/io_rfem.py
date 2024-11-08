@@ -13,6 +13,7 @@ from RFEM.BasicObjects.opening import Opening
 from RFEM.TypesForNodes.nodalSupport import NodalSupport
 from RFEM.LoadCasesAndCombinations.loadCase import LoadCase
 from RFEM.Loads.freeLoad import FreeLoad
+from RFEM.Loads.surfaceLoad import SurfaceLoad
 from RFEM.dataTypes import inf
 from RFEM.Results.resultTables import ResultTables
 from RFEM.Tools.GetObjectNumbersByType import GetAllObjects, GetObjectNumbersByType
@@ -26,9 +27,9 @@ from RFEM.enums import (
     )
 
 
-from horloadist.node import SupportNode
+from horloadist.node import XYSupportNode, ZSupportNode
 from horloadist.polygon import Polygon
-from horloadist.loads import XYLoad
+from horloadist.loads import Load
 
 
 def _get_max_obj_nr(obj_type:ObjectTypes) -> int:
@@ -46,7 +47,7 @@ def init_rfem_model(**kwargs) -> None:
 
 
 
-def to_rfem_support_node(node:SupportNode) -> dict:
+def to_rfem_xyzsupport_node(node:XYSupportNode) -> dict:
     Node(
         no=node._nr,
         coordinate_X=node._glo_x,
@@ -66,6 +67,29 @@ def to_rfem_support_node(node:SupportNode) -> dict:
             0.0
             ],
         name=f'node nr {node._nr} {node._glo_EIy:0.4f} {node._glo_EIx:0.4f}'
+    )
+    return {node._nr:[node._glo_x, node._glo_y]}
+
+
+def to_rfem_zsupport_node(node:ZSupportNode) -> dict:
+    Node(
+        no=node._nr,
+        coordinate_X=node._glo_x,
+        coordinate_Y=node._glo_y,
+        comment=f'{node._nr}'
+    )
+    NodalSupport.Nonlinearity(
+        no=node._nr,
+        nodes=f'{node._nr}',
+        spring_constant=[
+            0.0,
+            0.0,
+            inf,
+            0.0,
+            0.0,
+            0.0
+            ],
+        name=f'node nr {node._nr} vertical'
     )
     return {node._nr:[node._glo_x, node._glo_y]}
 
@@ -102,7 +126,7 @@ def to_rfem_shell(polygon:Polygon) -> int:
 
     Material.UserDefinedMaterial(
         no= mat_no,
-        name= 'EA GAv -> oo',
+        name= 'E, G -> oo',
         material_type = MaterialType.TYPE_BASIC,
         material_model = MaterialModel.MODEL_ISOTROPIC_LINEAR_ELASTIC,
         elasticity_modulus=10e12,
@@ -142,16 +166,19 @@ def to_rfem_opening(polygon:Polygon) -> None:
     Opening(no=opening_no, lines_no=line_nrs)
 
 
-
-
-def to_rfem_free_load(glo_x:float, glo_y:float, surface:int, load:XYLoad) -> int:
+def to_rfem_free_load(
+        glo_x:float,
+        glo_y:float,
+        surface:int,
+        load:Load,
+        z_load:float|None=None
+        ) -> int:
 
     loadcase_no = _get_max_obj_nr(ObjectTypes.E_OBJECT_TYPE_LOAD_CASE)
 
-    LoadCase(no=loadcase_no, name='const horizontal', self_weight=[False])
+    LoadCase(no=loadcase_no, name='io rfem loadcase', self_weight=[False])
 
     fx, fy = load._x_magnitude*10e2, load._y_magnitude*10e2
-
 
     if fx != 0:
         freeload_x_no = _get_max_obj_nr(ObjectTypes.E_OBJECT_TYPE_FREE_CONCENTRATED_LOAD)
@@ -175,6 +202,15 @@ def to_rfem_free_load(glo_x:float, glo_y:float, surface:int, load:XYLoad) -> int
             load_parameter=[fy, glo_x, glo_y]
         )
 
+    if z_load:
+        z_load_no = _get_max_obj_nr(ObjectTypes.E_OBJECT_TYPE_SURFACE_LOAD)
+        SurfaceLoad(
+            no=z_load_no,
+            load_case_no=loadcase_no,
+            surface_no=f'{surface}',
+            magnitude=z_load*10e2
+        )
+
     return loadcase_no
 
 
@@ -191,13 +227,22 @@ def from_rfem_nodeYForce(node_nr:int, loadcase_no:int) -> tuple:
         ]
     return ry/10e2
 
+def from_rfem_nodeZForce(node_nr:int, loadcase_no:int) -> tuple:
+    ry = ResultTables.NodesSupportForces(loading_no=loadcase_no)[node_nr][
+        'support_force_p_z'
+        ]
+    return ry/10e2
 
 
-def from_rfem_XForces(node_nrs:list[int], loadcase_no:int) -> list:
-    return [from_rfem_nodeXForce(node_nr-1, loadcase_no) for node_nr in node_nrs]
 
-def from_rfem_YForces(node_nrs:list[int], loadcase_no:int) -> list:
-    return [from_rfem_nodeYForce(node_nr-1, loadcase_no) for node_nr in node_nrs]
+def from_rfem_XForces(node_nrs:list[int], loadcase_no:int) -> pd.Series:
+    return pd.Series([from_rfem_nodeXForce(node_nr-1, loadcase_no) for node_nr in node_nrs])
+
+def from_rfem_YForces(node_nrs:list[int], loadcase_no:int) -> pd.Series:
+    return pd.Series([from_rfem_nodeYForce(node_nr-1, loadcase_no) for node_nr in node_nrs])
+
+def from_rfem_ZForces(node_nrs:list[int], loadcase_no:int) -> pd.Series:
+    return pd.Series([from_rfem_nodeZForce(node_nr-1, loadcase_no) for node_nr in node_nrs])
 
 
 

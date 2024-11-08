@@ -1,9 +1,9 @@
 import pandas as pd
 
-from horloadist.node import SupportNode
+from horloadist.node import XYSupportNode
 from horloadist.structure import Stucture
 from horloadist.utils import interpolateXY
-from horloadist.loads import XYLoad
+from horloadist.loads import Load
 from horloadist.linsolve import LinSolve
 
 class NonLinSolve:
@@ -54,7 +54,7 @@ class NonLinSolve:
     def __init__(
             self,
             structure:Stucture,
-            load:XYLoad,
+            load:Load,
             iterations:int=20,
             z_heigt:float=1,
             verbose:bool=True
@@ -82,7 +82,7 @@ class NonLinSolve:
             self._update_node_tracker(node)
 
 
-    def _update_node_tracker(self, node:SupportNode, init=False) -> None:
+    def _update_node_tracker(self, node:XYSupportNode, init=False) -> None:
         TRACKING_REGISTER = {
             f'node {node._nr} EIx':[node._glo_EIx],
             f'node {node._nr} EIy':[node._glo_EIy],

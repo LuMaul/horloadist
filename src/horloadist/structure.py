@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from horloadist.polygon import Polygon, Polygons
 from horloadist.stiffnesses import KX, KY
-from horloadist.node import SupportNode
+from horloadist.node import XYSupportNode, ZSupportNode
 from horloadist.utils import interpolateXY
 
 import horloadist.converters.io_opensees as ops_conv
@@ -82,18 +82,18 @@ class Stucture:
     """
     def __init__(
             self,
-            nodes:list[SupportNode],
+            xynodes:list[XYSupportNode],
             glo_mass_centre:tuple[float, float]|np.ndarray,
             verbose:bool=True
             ):
         
-        self._nodes = nodes
+        self._nodes = xynodes
         self._glo_mass_centre_x, self._glo_mass_centre_y = glo_mass_centre
         self._verbose = verbose
-        self._linnodes = self._to_linear_nodes(deepcopy(nodes))
+        self._linnodes = self._to_linear_nodes(deepcopy(xynodes))
 
 
-    def _to_linear_nodes(self, nodes:list[SupportNode]) -> list[SupportNode]:
+    def _to_linear_nodes(self, nodes:list[XYSupportNode]) -> list[XYSupportNode]:
 
         MOMENTUM = 0
 
@@ -104,7 +104,7 @@ class Stucture:
                     f"= {EI:,.1f} for linear solving"
                     )
 
-        def extractStiffnessAtMomentZero(node:SupportNode) -> SupportNode:
+        def extractStiffnessAtMomentZero(node:XYSupportNode) -> XYSupportNode:
             if isinstance(node._glo_EIx, pd.DataFrame):
                 node._glo_EIx = interpolateXY(node._glo_EIx, MOMENTUM)
                 printInfo(node._nr, 'x', node._glo_EIx)
@@ -252,7 +252,12 @@ class Stucture:
             )
         
 
-    def to_rfem(self, polygon:Polygon|Polygons, finish_mod=True, **rfem_model_kwargs) -> int:
+    def to_rfem(
+            self,
+            polygon:Polygon|Polygons,
+            z_nodes:list[ZSupportNode]=[],
+            finish_mod=True,
+            **rfem_model_kwargs) -> int:
         """
         Initializes an RFEM model and converts nodes and polygons to RFEM format.
 
@@ -290,7 +295,10 @@ class Stucture:
         rfem_conv.Model.clientModel.service.begin_modification()
 
         for node in self._nodes:
-            rfem_conv.to_rfem_support_node(node=node)
+            rfem_conv.to_rfem_xyzsupport_node(node=node)
+        
+        for z_node in z_nodes:
+            rfem_conv.to_rfem_zsupport_node(node=z_node)
 
         if isinstance(polygon, Polygon):
             shell_tag = rfem_conv.to_rfem_shell(polygon)
