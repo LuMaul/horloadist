@@ -119,9 +119,6 @@ class ZBeamElement:
     def _flip(series:pd.Series) -> pd.Series:
         return series.iloc[::-1].reset_index(drop=True)
 
-
-
-
     @property
     def _glo_y_moments(self) -> pd.Series:
         return pd.Series(self._integrate_over_z(self._glo_x_shear))
@@ -130,11 +127,18 @@ class ZBeamElement:
     def _glo_x_moments(self) -> pd.Series:
         return pd.Series(self._integrate_over_z(self._glo_y_shear))
 
+    @property
+    def _z_node_numbers(self) -> pd.Series:
+        def get_str(no:int) -> int:
+            return int(f'{self._no}{no}')
+        new_znode_nrs = map(get_str, range(len(self._glo_z_cords)))
+        return pd.Series((list(new_znode_nrs)))
 
     @property
     def _result_table(self) -> pd.DataFrame:
 
         results = {
+            'node nr':self._z_node_numbers,
             'glo_x':self._glo_x_cords,
             'glo_y':self._glo_y_cords,
             'glo_z':self._glo_z_cords,
