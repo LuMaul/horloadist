@@ -137,6 +137,7 @@ class ZBeamElement:
     @property
     def _result_table(self) -> pd.DataFrame:
 
+        # do not change order!
         results = {
             'node nr':self._z_node_numbers,
             'glo_x':self._glo_x_cords,

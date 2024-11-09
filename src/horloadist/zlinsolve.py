@@ -2,6 +2,7 @@ from horloadist.zbeam import ZBeamElement
 from horloadist.node import XYSupportNode
 from horloadist.linsolve import LinSolve
 
+import horloadist.converters.to_plotly as plotly_conv
 
 
 class ZLinSolve:
@@ -84,6 +85,31 @@ class ZLinSolve:
             )
             pseudo_beams.append(ps_beam)
         return pseudo_beams
+    
+
+    def to_plotly(
+            self,
+            fx_scale:float=1.00,
+            fy_scale:float=1.00,
+            fz_scale:float=1.00
+            ) -> None:
+        """
+        Convert pseudo Z-beam elements to a Plotly figure object.
+
+        Returns
+        -------
+        plotly_conv.go.Figure
+            Plotly figure object with pseudo Z-beam elements.
+        """
+        fig = plotly_conv.init_go()
+        for beam in self.pseudo_beams:
+            plotly_conv.to_go_beam(fig, beam)
+            plotly_conv.to_go_x_shear(fig, beam, scale=fx_scale)
+            plotly_conv.to_go_y_shear(fig, beam, scale=fy_scale)
+            plotly_conv.to_go_z_normf(fig, beam, scale=fz_scale)
+        
+        fig.write_html('test.html', auto_open=True)
+
 
 
 
@@ -95,10 +121,8 @@ if __name__ == '__main__':
     with open('test_linsolve.pkl', 'rb') as file:
         sol:LinSolve = pickle.load(file)
 
-    beams = ZLinSolve(linsolve=sol, z_num_floors=5, z_floor_heigt=3.00).pseudo_beams
+    beams = ZLinSolve(linsolve=sol, z_num_floors=5, z_floor_heigt=3.00)
 
-    for beam in beams:
-        beam.printTable()
-        print('\n')
+    beams.to_plotly(fz_scale=0.01)
 
 
