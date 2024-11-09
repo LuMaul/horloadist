@@ -65,6 +65,13 @@ sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
 # show and calculate in RFEM
 sol.to_rfem(polygon=tot_polygon, z_nodes=z_nodes, z_load_magnitude=1.00)
 
+import pickle
+
+with open('test_linsolve.pkl', 'wb') as file:
+    pickle.dump(sol, file)
+    
+
+
 # print results from Python and RFEM
 sol.printTable()
 
