@@ -1,6 +1,10 @@
+import pandas as pd
+import numpy as np
+
 from horloadist.zbeam import ZBeamElement
 from horloadist.node import XYSupportNode
 from horloadist.linsolve import LinSolve
+from horloadist.polygon import Polygon, Polygons
 
 import horloadist.converters.to_plotly as plotly_conv
 
@@ -43,6 +47,52 @@ class ZLinSolve:
         self._result_table = self._linsolve._result_table
         self._z_num_floors = z_num_floors
         self._z_floor_heigt = z_floor_heigt
+
+    @property
+    def _z_heigt(self) -> float:
+        return self._z_num_floors * self._z_floor_heigt
+
+    @property
+    def _glo_z_shell_cords(self) -> pd.Series:
+        z_cords = np.linspace(
+            start=self._z_floor_heigt,
+            stop=self._z_heigt,
+            num=self._z_num_floors
+            )
+        return pd.Series(z_cords)
+    
+    @property
+    def _glo_z_cords(self) -> pd.Series:
+        z_cords = np.linspace(
+            start=0.00,
+            stop=self._z_heigt,
+            num=self._z_num_floors
+        )
+        return pd.Series(z_cords)
+    
+    @property
+    def _glo_x_stiffc_cords(self) -> pd.Series:
+        x_cord = self._linsolve._structure._glo_stiff_centre_x
+        x_cords = np.full_like(self._glo_z_cords, x_cord)
+        return pd.Series(x_cords)
+    
+    @property
+    def _glo_y_stiffc_cords(self) -> pd.Series:
+        y_cord = self._linsolve._structure._glo_stiff_centre_y
+        y_cords = np.full_like(self._glo_z_cords, y_cord)
+        return pd.Series(y_cords)
+    
+    @property
+    def _glo_x_massc_cords(self) -> pd.Series:
+        x_cord = self._linsolve._structure._glo_mass_centre_x
+        x_cords = np.full_like(self._glo_z_cords, x_cord)
+        return pd.Series(x_cords)
+    
+    @property
+    def _glo_y_massc_cords(self) -> pd.Series:
+        y_cord = self._linsolve._structure._glo_mass_centre_y
+        y_cords = np.full_like(self._glo_z_cords, y_cord)
+        return pd.Series(y_cords)
 
 
     def _extract_glo_f_x(self, node:XYSupportNode) -> float:
@@ -91,7 +141,10 @@ class ZLinSolve:
             self,
             fx_scale:float=1.00,
             fy_scale:float=1.00,
-            fz_scale:float=1.00
+            fz_scale:float=1.00,
+            mx_scale:float=1.00,
+            my_scale:float=1.00,
+            polygon:Polygon|Polygons|None=None,
             ) -> None:
         """
         Convert pseudo Z-beam elements to a Plotly figure object.
@@ -107,6 +160,35 @@ class ZLinSolve:
             plotly_conv.to_go_x_shear(fig, beam, scale=fx_scale)
             plotly_conv.to_go_y_shear(fig, beam, scale=fy_scale)
             plotly_conv.to_go_z_normf(fig, beam, scale=fz_scale)
+            plotly_conv.to_go_x_moments(fig, beam, scale=mx_scale)
+            plotly_conv.to_go_y_moments(fig, beam, scale=my_scale)
+
+
+        for z in self._glo_z_shell_cords:
+            if isinstance(polygon, Polygon):
+                plotly_conv.to_go_polygon(fig, polygon, z=z)
+
+            if isinstance(polygon, Polygons):
+                plotly_conv.to_go_polygons(fig, polygon, z=z)
+
+        
+        plotly_conv.to_go_3dLine(
+            fig=fig,
+            x=self._glo_x_stiffc_cords,
+            y=self._glo_y_stiffc_cords,
+            z=self._glo_z_cords,
+            name='stiffc',
+            kwargs=plotly_conv.STIFFC_STYLE
+        )
+
+        plotly_conv.to_go_3dLine(
+            fig=fig,
+            x=self._glo_x_massc_cords,
+            y=self._glo_y_massc_cords,
+            z=self._glo_z_cords,
+            name='massc',
+            kwargs=plotly_conv.MASSC_STYLE
+        )
         
         fig.write_html('test.html', auto_open=True)
 
@@ -123,6 +205,11 @@ if __name__ == '__main__':
 
     beams = ZLinSolve(linsolve=sol, z_num_floors=5, z_floor_heigt=3.00)
 
-    beams.to_plotly(fz_scale=0.01)
+    pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
+    neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
+    neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
+    tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
+
+    beams.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
 
 
