@@ -57,7 +57,7 @@ STIFFC_STYLE = {
 }
 
 MASSC_STYLE = {
-    'line': {'color': 'red'}
+    'line': {'color': 'green'}
 }
 
 DEFAULT_FACE_STYLE = {
