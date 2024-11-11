@@ -1,6 +1,10 @@
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import os
+import time
+
+import __main__
 
 from horloadist.zbeam import ZBeamElement
 from horloadist.polygon import Polygon, Polygons
@@ -334,3 +338,12 @@ def to_go_polygons(fig:go.Figure, polygons:Polygons, z:float=0.0) -> go.Figure:
     return fig
 
 
+def write_html(fig:go.Figure, **kwargs) -> None:
+
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    fname = f'{os.path.basename(__main__.__file__)}_{timestamp}.html'
+    kwargs.setdefault('file', fname)
+
+    kwargs.setdefault('auto_open', True)
+    
+    fig.write_html(**kwargs)
