@@ -145,14 +145,52 @@ class ZLinSolve:
             mx_scale:float=1.00,
             my_scale:float=1.00,
             polygon:Polygon|Polygons|None=None,
+            **kwargs
             ) -> None:
         """
-        Convert pseudo Z-beam elements to a Plotly figure object.
+        Generates a Plotly 3D figure to visualize pseudo Z-beam elements with force and moment scaling.
+
+        Parameters
+        ----------
+        fx_scale : float, optional
+            Scaling factor for forces in the x-direction (default is 1.00).
+        fy_scale : float, optional
+            Scaling factor for forces in the y-direction (default is 1.00).
+        fz_scale : float, optional
+            Scaling factor for normal forces in the z-direction (default is 1.00).
+        mx_scale : float, optional
+            Scaling factor for moments around the x-axis (default is 1.00).
+        my_scale : float, optional
+            Scaling factor for moments around the y-axis (default is 1.00).
+        polygon : Polygon, Polygons, or None, optional
+            Polygonal representation(s) of 3D elements to add to the figure.
+            Accepts a single `Polygon`, multiple `Polygons`, or None for no polygons.
+        **kwargs : dict, optional
+            Additional keyword arguments for customizing Plotly figure export, such as
+            `file` for HTML export or styling options.
 
         Returns
         -------
-        plotly_conv.go.Figure
-            Plotly figure object with pseudo Z-beam elements.
+        None
+            This function modifies the figure in place and does not return a value.
+            The generated Plotly figure is saved or displayed as an HTML file based
+            on parameters passed in **kwargs.
+
+        Notes
+        -----
+        This function uses the `plotly_conv` module to initialize a 3D Plotly figure,
+        which visualizes the properties of pseudo Z-beam elements in the structure.
+        It includes the following graphical elements:
+        
+        - Pseudo Z-beam geometries (lines connecting beam nodes).
+        - X and Y shear forces, and Z normal forces, scaled by `fx_scale`, `fy_scale`,
+        and `fz_scale`, respectively.
+        - Moments around X and Y axes, scaled by `mx_scale` and `my_scale`.
+        - Optional polygonal shells based on `polygon` argument.
+        - 3D lines representing stiffness (`stiffc`) and mass centerlines (`massc`).
+        
+        After constructing the figure, it is exported to an HTML file if `filename` 
+        or other file-saving options are specified in `kwargs`.
         """
         fig = plotly_conv.init_go()
         for beam in self.pseudo_beams:
@@ -190,4 +228,4 @@ class ZLinSolve:
             kwargs=plotly_conv.MASSC_STYLE
         )
         
-        fig.write_html('test.html', auto_open=True)
+        plotly_conv.write_html(fig, **kwargs)
