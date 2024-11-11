@@ -6,7 +6,54 @@ Calculate **hor**izontal **load** **dist**ribution on multiple supports of a sin
 
 This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a shell, along with supports that represent walls and their bending stiffnesses around the x and y axes. Afterwards you can calculate the horizontal reaction forces on the support nodes (walls). Use `NonLinSolve` for solving systems iteratively with nonlinear wall bending stiffnesses taken from user created csv files.
 
+## Pseudo 3D analysis using Plotly
+   
+```python
+# shell
+pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
+
+# openings
+neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
+neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
+
+# all polygons together
+tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
+
+# get horinzontal reaction forces
+hor_sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
+
+# pseudo transform to vertical
+zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=10, z_floor_heigt=3.00)
+
+# plot pseudo 3D
+zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
+```	
+![plotly example](example_to_plotly.png "plotly")
+
+
 ## Example Table Output of `LinSolve`
+
+```python
+
+The provided example creates a plate structure with seven support nodes and solves it for a specific load case.
+
+# Create support nodes
+w1 = SupportNode(nr=1, glob_x=-10.0,  glob_y=2.5, glob_kx=globalIy(5, 0.3), glob_ky=globalIx(5, 0.3))
+# ... (other nodes)
+
+# Define the plate
+plate = Polygon([[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
+
+# Create and solve the structure
+struc = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=plate.centroid)
+struc.printTable()
+
+# Solve the linear system
+sol = LinSolve(structure=struc, x_mass_force=0, y_mass_force=-1)
+sol.printTable()
+```
+
+output:
 
 ```
 glo mass   centre [x,y] : 0.0000, 0.0000
@@ -42,76 +89,11 @@ tor. Ts = Ts,x + Ts,y   : 2.4672
 6        7       0.0 -0.331345  -0.000140  3.993476e-02 -0.000140 -0.291411
 ```
 
-## Example Output of `NonLinSolve`
-
-Output of `plot_nlsolve` from `NONLIN_main.py` in the examples directory:
-
-![non linear example](example_nlsolve_rev.png "non linear convergation process")
 
 
-## Prerequisites
-
-- `horloadist` library
-- Python 3.x
-- pandas
-- numpy
-- matplotlib
-- datetime
-
-## Installation
-
-install via pip:
-```
-pip install horloadist
-```
 
 
-## Usage
-
-The main script demonstrates how to use the `horloadist` library to create a structural model and solve it. Here's a brief overview of the process:
-
-1. Import necessary classes from `horloadist`:
-   ```python
-   from horloadist import SupportNode, Polygon, Stucture, LinSolve
-   ```
-
-2. Define helper functions for moment of inertia calculations:
-   ```python
-   def globalIy(dx, dy):
-      return dy*dx**3/12
-    
-   def globalIx(dx, dy):
-      return dx*dy**3/12
-   ```
-
-3. Create support nodes using the `SupportNode` class.
-4. Define the structure's shape using the `Polygon` class.
-5. Create a `Stucture` object with the defined polygon and support nodes.
-6. Solve the structure using `LinSolve`.
-7. Print the results.
-
-## Coding Example
-
-The provided example creates a plate structure with seven support nodes and solves it for a specific load case.
-
-```python
-# Create support nodes
-w1 = SupportNode(nr=1, glob_x=-10.0,  glob_y=2.5, glob_kx=globalIy(5, 0.3), glob_ky=globalIx(5, 0.3))
-# ... (other nodes)
-
-# Define the plate
-plate = Polygon([[-12.5,-7.5], [12.5, -7.5], [12.5, 7.5], [-12.5, 7.5]])
-
-# Create and solve the structure
-struc = Stucture(nodes=[w1, w2, w3, w4, w5, w6, w7], glo_mass_centre=plate.centroid)
-sol = LinSolve(structure=struc, x_mass_force=0, y_mass_force=-1)
-
-# Print results
-struc.printTable()
-sol.printTable()
-```
-
-## 2D Plot Example using Matplotlib
+## 2D Analysis using Matplotlib
 ```python
 # Create structure
 s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
@@ -128,33 +110,35 @@ ls1.to_mpl(poly, save=True, fformat='png')
 ![mpl conv example](example_to_mpl.png "mpl convert example")
 
 
-## Pseudo 3D analysis using Plotly
-   
-```python
-# shell
-pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
 
-# openings
-neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
-neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
+## Example Output of `NonLinSolve`
 
-# all polygons together
-tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
+Output of `plot_nlsolve` from `NONLIN_main.py` in the examples directory:
 
-# get horinzontal reaction forces
-hor_sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
-
-# pseudo transform to vertical
-zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=5, z_floor_heigt=3.00)
-
-# plot pseudo 3D
-zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
-```	
-![plotly example](example_to_plotly.png "plotly")
+![non linear example](example_nlsolve_rev.png "non linear convergation process")
 
 
 
+## Prerequisites
 
+- `horloadist` library
+- Python 3.x
+- pandas
+- numpy
+- scipy
+- o3seespy
+- RFEM
+- datetime
+- matplotlib
+- plotly
+
+
+## Installation
+
+install via pip:
+```
+pip install horloadist
+```
 
 
 ## Possible Further Improvements

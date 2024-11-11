@@ -124,7 +124,8 @@ dependencies = [
   "scipy",
   "matplotlib",
   "o3seespy",
-  "RFEM"
+  "RFEM",
+  "Plotly"
 ]
 
 # List additional groups of dependencies here (e.g. development
