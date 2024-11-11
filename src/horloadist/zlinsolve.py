@@ -94,25 +94,6 @@ class ZLinSolve:
         y_cords = np.full_like(self._glo_z_cords, y_cord)
         return pd.Series(y_cords)
 
-
-    def _extract_glo_f_x(self, node:XYSupportNode) -> float:
-        f_x = self._result_table['Vx'].loc[self._result_table['node nr'] == node._nr]
-        return float(f_x.iloc[0])
-
-    def _extract_glo_f_y(self, node:XYSupportNode) -> float:
-        f_y = self._result_table['Vy'].loc[self._result_table['node nr'] == node._nr]
-        return float(f_y.iloc[0])
-
-
-    def _extract_glo_f_z(self, node:XYSupportNode) -> float:
-        if 'RFEM Vz' in self._result_table:
-            f_z = self._result_table['RFEM Vz'].loc[
-                self._result_table['node nr'] == node._nr
-                ]
-            return float(f_z.iloc[0])
-        else:
-            return 0.0
-
     @property
     def pseudo_beams(self) -> list[ZBeamElement]:
         """
@@ -129,9 +110,9 @@ class ZLinSolve:
                 node=node,
                 z_num_floors=self._z_num_floors,
                 z_floor_heigt=self._z_floor_heigt,
-                const_f_x=self._extract_glo_f_x(node),
-                const_f_y=self._extract_glo_f_y(node),
-                const_f_z=self._extract_glo_f_z(node),
+                const_f_x=self._linsolve._extract_glo_f_x(node),
+                const_f_y=self._linsolve._extract_glo_f_y(node),
+                const_f_z=self._linsolve._extract_glo_f_z(node),
             )
             pseudo_beams.append(ps_beam)
         return pseudo_beams
@@ -229,3 +210,9 @@ class ZLinSolve:
         )
         
         plotly_conv.write_html(fig, **kwargs)
+
+
+
+
+
+    
