@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import time
 
 import __main__
 
@@ -205,5 +206,7 @@ def to_plt_force(
 
 def to_file(**kwargs) -> None:
     kwargs.setdefault('format', 'pdf')
-    kwargs.setdefault('fname', f'{os.path.basename(__main__.__file__)}.{kwargs['format']}')
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    fname = f'{os.path.basename(__main__.__file__)}_{timestamp}.{kwargs['format']}'
+    kwargs.setdefault('fname', fname)
     plt.savefig(**kwargs)
