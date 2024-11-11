@@ -3,7 +3,6 @@ import numpy as np
 import scipy.integrate as sc_int
 
 from horloadist.node import XYSupportNode
-from horloadist.linsolve import LinSolve
 
 
 class ZBeamElement:
@@ -52,7 +51,7 @@ class ZBeamElement:
             node:XYSupportNode,
             z_num_floors:int,
             z_floor_heigt:float,
-            const_f_x:float,
+            const_f_x:float, # is not constant for single mass oscillator
             const_f_y:float,
             const_f_z:float=0.00,
             ) -> None:
@@ -68,7 +67,6 @@ class ZBeamElement:
         self._const_f_y = const_f_y
         self._const_f_z = const_f_z
 
-
     @property
     def _z_heigt(self) -> float:
         return self._z_num_floors * self._z_floor_heigt
@@ -83,7 +81,7 @@ class ZBeamElement:
             z_cords.append(z_end)
 
         return pd.Series(np.flip(z_cords))
-
+    
     @property
     def _glo_x_cords(self) -> pd.Series:
         return pd.Series(np.full_like(self._glo_z_cords, self._glo_x))
@@ -101,12 +99,12 @@ class ZBeamElement:
     def _shear_cumsum(self, f_const:float) -> pd.Series: # could be more elegant
         f_arr = np.cumsum(np.full_like(self._glo_z_cords[::2], f_const)).repeat(2)
         return pd.Series(f_arr)
-
+    
 
     @property
     def _glo_x_shear(self) -> pd.Series:
         return self._shear_cumsum(self._const_f_x)
-
+    
     @property
     def _glo_y_shear(self) -> pd.Series:
         return self._shear_cumsum(self._const_f_y)
