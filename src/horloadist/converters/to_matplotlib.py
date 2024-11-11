@@ -205,7 +205,6 @@ def to_plt_force(
 
 
 def to_file(**kwargs) -> None:
-    kwargs.setdefault('format', 'pdf')
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     fname = f'{os.path.basename(__main__.__file__)}_{timestamp}.{kwargs['format']}'
     kwargs.setdefault('fname', fname)
