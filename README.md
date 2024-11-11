@@ -6,6 +6,13 @@ Calculate **hor**izontal **load** **dist**ribution on multiple supports of a sin
 
 This project provides a tool for structural analysis using the `horloadist` library. You can define a 2D polygon in the x-y plane representing a shell, along with supports that represent walls and their bending stiffnesses around the x and y axes. Afterwards you can calculate the horizontal reaction forces on the support nodes (walls). Use `NonLinSolve` for solving systems iteratively with nonlinear wall bending stiffnesses taken from user created csv files.
 
+## Installation
+
+install via pip:
+```
+pip install horloadist
+```
+
 ## Pseudo 3D analysis using Plotly
    
 ```python
@@ -131,14 +138,6 @@ Output of `plot_nlsolve` from `NONLIN_main.py` in the examples directory:
 - datetime
 - matplotlib
 - plotly
-
-
-## Installation
-
-install via pip:
-```
-pip install horloadist
-```
 
 
 ## Possible Further Improvements
