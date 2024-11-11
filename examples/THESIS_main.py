@@ -54,10 +54,12 @@ loadcase_xy = Load(x_magnitude=-1, y_magnitude=1)
 
 sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
 
-## updates solution with vertical load results
+# updates solution with vertical load results
 # sol.to_rfem(polygon=tot_polygon, z_nodes=z_nodes, z_load_magnitude=1.00)
 
-sol.printTable()
+# sol.printTable()
+
+# sol.to_mpl(tot_polygon, fname='example_to_mpl', show=False, save=True, fformat='png')
 
 
 # analyzing it pseudo vertical
@@ -67,6 +69,6 @@ import os
 with open(os.path.join('example_vload_from_rfem','THESIS_main.pkl'), 'rb') as file:
     vert_sol:LinSolve = pickle.load(file)
 
-zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=5, z_floor_heigt=3.00)
+zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=10, z_floor_heigt=3.00)
 
 zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
