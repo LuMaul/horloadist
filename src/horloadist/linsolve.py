@@ -147,6 +147,25 @@ class LinSolve:
             )
 
 
+    def _extract_glo_f_x(self, node:XYSupportNode) -> float:
+        rx = self._result_table['Vx'].loc[self._result_table['node nr'] == node._nr]
+        return float(rx.iloc[0])
+    
+
+    def _extract_glo_f_y(self, node:XYSupportNode) -> float:
+        ry = self._result_table['Vy'].loc[self._result_table['node nr'] == node._nr]
+        return float(ry.iloc[0])
+
+    def _extract_glo_f_z(self, node:XYSupportNode) -> float:
+        if 'RFEM Vz' in self._result_table:
+            f_z = self._result_table['RFEM Vz'].loc[
+                self._result_table['node nr'] == node._nr
+                ]
+            return float(f_z.iloc[0])
+        else:
+            return 0.0
+
+
     def updateNodes(self) -> None:
         """
         Updates the reaction forces (Rx, Ry) for each node in the structure.
@@ -158,17 +177,10 @@ class LinSolve:
         -------
         None
         """
-        def extracVxByNode(node:XYSupportNode) -> float:
-            rx = self._result_table['Vx'].loc[self._result_table['node nr'] == node._nr]
-            return float(rx.iloc[0])
-        
-        def extracVyByNode(node:XYSupportNode) -> float:
-            ry = self._result_table['Vy'].loc[self._result_table['node nr'] == node._nr]
-            return float(ry.iloc[0])
 
         for node in self._structure._linnodes:
-            node._Rx = -extracVxByNode(node)
-            node._Ry = -extracVyByNode(node)
+            node._Rx = -self._extract_glo_f_x(node)
+            node._Ry = -self._extract_glo_f_y(node)
 
 
     def to_rfem(self,
@@ -345,6 +357,7 @@ class LinSolve:
 
         if save:
             kwargs = {'fname':f'{fname}.{fformat}'}
+            kwargs.setdefault('format', f'{fformat}')
             plt_conv.to_file(**kwargs)
         
         if show:
