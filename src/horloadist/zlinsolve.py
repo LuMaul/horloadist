@@ -191,25 +191,3 @@ class ZLinSolve:
         )
         
         fig.write_html('test.html', auto_open=True)
-
-
-
-
-
-
-if __name__ == '__main__':
-    import pickle
-
-    with open('test_linsolve.pkl', 'rb') as file:
-        sol:LinSolve = pickle.load(file)
-
-    beams = ZLinSolve(linsolve=sol, z_num_floors=5, z_floor_heigt=3.00)
-
-    pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
-    neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
-    neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
-    tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
-
-    beams.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
-
-

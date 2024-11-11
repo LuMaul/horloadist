@@ -1,4 +1,4 @@
-from horloadist import KX, KY, XYSupportNode, ZSupportNode, Polygon, Polygons, Stucture, Load, LinSolve
+from horloadist import KX, KY, XYSupportNode, ZSupportNode, Polygon, Polygons, Stucture, Load, LinSolve, ZLinSolve
 
 kx1 = KX.constRectangular(glo_dx=5.26, glo_dy=0.20)
 ky1 = KY.constRectangular(glo_dx=5.26, glo_dy=0.20)
@@ -54,25 +54,19 @@ loadcase_xy = Load(x_magnitude=-1, y_magnitude=1)
 
 sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
 
-# for lc in [loadcase_x, loadcase_y, loadcase_xy]:
+## updates solution with vertical load results
+# sol.to_rfem(polygon=tot_polygon, z_nodes=z_nodes, z_load_magnitude=1.00)
 
-#     sol = LinSolve(structure=struc, load=lc)
-    
-#     for dir in ['sum', 'torsion', 'transl']:
-#         fname = f'{dir} fx {lc._x_magnitude} fy {lc._y_magnitude}'
-#         sol.to_mpl(polygon=tot_polygon, fname=fname, show=False, save=True)
-
-# show and calculate in RFEM
-sol.to_rfem(polygon=tot_polygon, z_nodes=z_nodes, z_load_magnitude=1.00)
-
-import pickle
-
-with open('test_linsolve.pkl', 'wb') as file:
-    pickle.dump(sol, file)
-    
-
-
-# print results from Python and RFEM
 sol.printTable()
 
 
+# analyzing it pseudo vertical
+import pickle
+import os
+
+with open(os.path.join('example_vload_from_rfem','THESIS_main.pkl'), 'rb') as file:
+    vert_sol:LinSolve = pickle.load(file)
+
+zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=5, z_floor_heigt=3.00)
+
+zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)

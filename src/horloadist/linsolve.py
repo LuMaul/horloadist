@@ -351,10 +351,3 @@ class LinSolve:
             plt_conv.plt.show()
 
         return fig, ax
-    
-
-class ZLinSolve:
-    def __init__(self, xy_structure:Stucture, z_nodes:list[ZSupportNode]) -> None:
-        self._xy_structure = xy_structure
-        self._z_nodes = z_nodes
-        pass

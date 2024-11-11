@@ -5,3 +5,4 @@ __pycache__
 *.pkl
 !example_nlsolve_rev.png
 !example_to_mpl.png
+!example_to_plotly.png

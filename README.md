@@ -90,7 +90,7 @@ The main script demonstrates how to use the `horloadist` library to create a str
 6. Solve the structure using `LinSolve`.
 7. Print the results.
 
-## Example
+## Coding Example
 
 The provided example creates a plate structure with seven support nodes and solves it for a specific load case.
 
@@ -111,7 +111,7 @@ struc.printTable()
 sol.printTable()
 ```
 
-## Plot Example
+## 2D Plot Example using Matplotlib
 ```python
 # Create structure
 s1 = Stucture(nodes=[w1, w2, w3, w4], glo_mass_centre=poly.centroid)
@@ -126,6 +126,35 @@ ls1 = LinSolve(structure=s1, load=load)
 ls1.to_mpl(poly, save=True, fformat='png')
 ```
 ![mpl conv example](example_to_mpl.png "mpl convert example")
+
+
+## Pseudo 3D analysis using Plotly
+   
+```python
+# shell
+pos_poly = Polygon([[0.000, 0.000], [16.750, 0.000], [16.750, 15.540], [0.000, 15.540]])
+
+# openings
+neg_poly1 = Polygon([[5.100, 6.970], [ 6.850, 6.970], [ 6.850,  8.570], [5.100, 8.570]])
+neg_poly2 = Polygon([[8.420, 6.521], [11.390, 6.521], [11.390,  9.020], [8.420, 9.020]])
+
+# all polygons together
+tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2])
+
+# get horinzontal reaction forces
+hor_sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
+
+# pseudo transform to vertical
+zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=5, z_floor_heigt=3.00)
+
+# plot pseudo 3D
+zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
+```	
+![plotly example](example_to_plotly.png "plotly")
+
+
+
+
 
 
 ## Possible Further Improvements
