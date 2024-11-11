@@ -102,6 +102,14 @@ class Polygons:
         self._pos_polygon = pos_polygon
         self._neg_polygons = neg_polygons
 
+    @property
+    def area(self) -> float:
+        tot_poly_area = 0.00
+        tot_poly_area += self._pos_polygon.area
+        for neg_polygon in self._neg_polygons:
+            tot_poly_area -= neg_polygon.area
+        return float(tot_poly_area)
+
 
     @property
     def centroid(self) -> tuple[float, float]:
