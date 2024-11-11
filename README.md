@@ -159,7 +159,7 @@ zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
 
 ## Possible Further Improvements
 
-- implement compas, opensees, plotly converter for geometry and force-vectors
+- implement compas, opensees converter for geometry and force-vectors
 - add plot for bending stiffnesses imported from csv files
 - add angle param for `KX.globalRectangular(... , angle_from_x : float = ...)`
 - Add a ceiling recess

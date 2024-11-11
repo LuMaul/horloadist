@@ -2,7 +2,6 @@ __pycache__
 .vscode
 *.pdf
 *.png
-*.pkl
 !example_nlsolve_rev.png
 !example_to_mpl.png
 !example_to_plotly.png
