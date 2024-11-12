@@ -3,6 +3,7 @@ import numpy as np
 import scipy.integrate as sc_int
 
 from horloadist.node import XYSupportNode
+import horloadist.loadvec as loadvec
 
 
 class ZBeamElement:
@@ -49,32 +50,49 @@ class ZBeamElement:
     def __init__(
             self,
             node:XYSupportNode,
-            z_num_floors:int,
-            z_floor_heigt:float,
-            const_f_x:float, # is not constant for single mass oscillator
-            const_f_y:float,
-            const_f_z:float=0.00,
+            z_space:np.ndarray,
+            f_x_vec:np.ndarray,
+            f_y_vec:np.ndarray,
+            f_z_vec:np.ndarray|None=None,
             ) -> None:
         
+        self._node = node
         self._no = node._nr
         self._glo_x = node._glo_x
         self._glo_y = node._glo_y
 
-        self._z_num_floors = z_num_floors
-        self._z_floor_heigt = z_floor_heigt
+        self._z_space = z_space
 
-        self._const_f_x = const_f_x
-        self._const_f_y = const_f_y
-        self._const_f_z = const_f_z
+        self._f_x_vec = f_x_vec
+        self._f_y_vec = f_y_vec
+        self._f_z_vec = self._get_f_z_vec(f_z_vec)
+
+
+    def _get_f_z_vec(self, f_z_vec) -> np.ndarray:
+        if f_z_vec is None:
+            return loadvec.uniform(z_space=self._z_space, const_force=0.0)
+        return f_z_vec
+
 
     @property
     def _z_heigt(self) -> float:
-        return self._z_num_floors * self._z_floor_heigt
+        return max(self._z_space)
+    
+    
+    @property
+    def _z_num_floors(self) -> int:
+        return len(self._z_space) - 1
+
+    
+    @property
+    def _z_floor_heigt(self) -> float:
+        return self._z_heigt / self._z_num_floors
+
 
     @property
     def _glo_z_cords(self) -> pd.Series:
         z_cords = []
-        for z_index in range(int(self._z_num_floors)):
+        for z_index in range(self._z_num_floors):
             z_sta = z_index * self._z_floor_heigt
             z_end = (z_index + 1) * self._z_floor_heigt
             z_cords.append(z_sta)
@@ -96,22 +114,22 @@ class ZBeamElement:
         return pd.Series(integral)
 
 
-    def _shear_cumsum(self, f_const:float) -> pd.Series: # could be more elegant
-        f_arr = np.cumsum(np.full_like(self._glo_z_cords[::2], f_const)).repeat(2)
+    def _shear_cumsum(self, f_vec:np.ndarray) -> pd.Series: # could be more elegant
+        f_arr = np.cumsum(np.flip(f_vec)).repeat(2)[:-2]
         return pd.Series(f_arr)
     
 
     @property
     def _glo_x_shear(self) -> pd.Series:
-        return self._shear_cumsum(self._const_f_x)
+        return self._shear_cumsum(self._f_x_vec)
     
     @property
     def _glo_y_shear(self) -> pd.Series:
-        return self._shear_cumsum(self._const_f_y)
+        return self._shear_cumsum(self._f_y_vec)
 
     @property
     def _glo_z_normf(self) -> pd.Series:
-        return self._shear_cumsum(self._const_f_z)
+        return self._shear_cumsum(self._f_z_vec)
 
     @staticmethod
     def _flip(series:pd.Series) -> pd.Series:
@@ -135,7 +153,7 @@ class ZBeamElement:
     @property
     def _result_table(self) -> pd.DataFrame:
 
-        # do not change order!
+        # do not change order! (Plotly Hovertemplates depend on it)
         results = {
             'node nr':self._z_node_numbers,
             'glo_x':self._glo_x_cords,
@@ -178,9 +196,9 @@ class ZBeamElement:
             f"z div     : {self._z_floor_heigt} \n"
             f"heigt     : {self._z_heigt} \n"
             "-----------------------------------\n"
-            f"const glo fx  : {self._const_f_x} \n"
-            f"const glo fy  : {self._const_f_y} \n"
-            f"const glo fz  : {self._const_f_z} \n"
+            f"glo fx vec  : {self._f_x_vec} \n"
+            f"glo fy vec  : {self._f_y_vec} \n"
+            f"glo_fz vec  : {self._f_z_vec} \n"
             "-----------------------------------\n"
             f"{self._result_table}"
         )

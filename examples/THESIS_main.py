@@ -1,4 +1,17 @@
-from horloadist import KX, KY, XYSupportNode, ZSupportNode, Polygon, Polygons, Stucture, Load, LinSolve, ZLinSolve
+from horloadist import (
+    KX,
+    KY,
+    XYSupportNode,
+    ZSupportNode,
+    Polygon,
+    Polygons,
+    Stucture,
+    Load,
+    LinSolve,
+    ZLinSolve,
+    loadvec
+)
+
 
 kx1 = KX.constRectangular(glo_dx=5.26, glo_dy=0.20)
 ky1 = KY.constRectangular(glo_dx=5.26, glo_dy=0.20)
@@ -49,15 +62,13 @@ tot_polygon = Polygons(pos_polygon=pos_poly, neg_polygons=[neg_poly1, neg_poly2]
 struc = Stucture(xynodes=xy_nodes, glo_mass_centre=tot_polygon.centroid)
 
 loadcase_x  = Load(x_magnitude=1, y_magnitude=0)
-loadcase_y  = Load(x_magnitude=0, y_magnitude=1)
-loadcase_xy = Load(x_magnitude=-1, y_magnitude=1)
 
-sol = LinSolve(xy_structure=struc, xy_load=loadcase_xy)
+sol = LinSolve(xy_structure=struc, xy_load=loadcase_x)
 
 # updates solution with vertical load results
 # sol.to_rfem(polygon=tot_polygon, z_nodes=z_nodes, z_load_magnitude=1.00)
 
-# sol.printTable()
+sol.printTable()
 
 # sol.to_mpl(tot_polygon, fname='example_to_mpl', show=False, save=True, fformat='png')
 
@@ -69,6 +80,38 @@ import os
 with open(os.path.join('example_vload_from_rfem','THESIS_main.pkl'), 'rb') as file:
     vert_sol:LinSolve = pickle.load(file)
 
-zsol = ZLinSolve(linsolve=vert_sol, z_num_floors=10, z_floor_heigt=3.00)
 
-zsol.to_plotly(fz_scale=0.01, mx_scale=0.10, my_scale=0.10, polygon=tot_polygon)
+z_space = loadvec.z_linspace(z_num_floors=10, floor_heigt=2.50)
+
+f_x_vec = loadvec.weighted_norm_g_by_polygon(
+    z_space,
+    S=1.0,
+    polygon=tot_polygon,
+    thickness=0.15,
+    density=25.0
+    )
+
+# f_x_vec = loadvec.uniform(z_space=z_space, const_force=1000.0)
+
+f_y_vec = loadvec.uniform(z_space=z_space, const_force=0.0)
+
+zsol = ZLinSolve(
+    linsolve=vert_sol,
+    z_space=z_space,
+    f_x_vec=f_x_vec,
+    f_y_vec=f_y_vec
+)
+
+zsol.to_plotly(
+    tot_fx_scale=10e-4,
+    tot_fy_scale=10e-4,
+    fx_scale=10e-4,
+    fy_scale=10e-4,
+    fz_scale=10e-2/2,
+    vx_scale=10e-4,
+    vy_scale=10e-4,
+    vz_scale=10e-2/2,
+    mx_scale=10e-4/3,
+    my_scale=10e-4/3,
+    polygon=tot_polygon
+    )

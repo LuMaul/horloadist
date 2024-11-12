@@ -56,6 +56,9 @@ class Polygon:
         centroid = statical_moments / self.area
         return centroid
     
+    def mass(self, thickness:float, density:float=25.0) -> float:
+        return float(self.area) * thickness * density
+    
 
 class Polygons:
     """
@@ -111,6 +114,10 @@ class Polygons:
         return float(tot_poly_area)
 
 
+    def mass(self, thickness:float, density:float=25.0) -> float:
+        return float(self.area) * thickness * density
+
+
     @property
     def centroid(self) -> tuple[float, float]:
         """
@@ -137,5 +144,6 @@ class Polygons:
 
         return x, y
     
+
     def _stat_moment(self, polygon:Polygon) -> np.ndarray:
         return polygon.area * np.array(polygon.centroid)

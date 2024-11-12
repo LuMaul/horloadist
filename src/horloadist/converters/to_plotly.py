@@ -10,11 +10,95 @@ from horloadist.zbeam import ZBeamElement
 from horloadist.polygon import Polygon, Polygons
 
 
+PLOTLY_TEMPLATE = 'simple_white'
+
+
 ZBEAM_STYLE = {
     'line': {'color': 'black'},
     'legendgroup': 'beams',
     'legendgrouptitle_text': "Beams"
 }
+
+FORCE_CONELENGTH = 0.3
+
+
+X_MASSC_FORCE_CONESTYLE = {
+    'legendgroup' : 'xmcforce',
+    'legendgrouptitle_text': "Tot Fx",
+    'anchor':'tip' ,
+    "colorscale": [[0, "green"], [1, "green"]],
+    'showscale': False,
+}
+
+
+X_MASSC_FORCE_LINESTYLE = {
+    'line': {'color': 'green', 'width':2},
+    'legendgroup' : 'xmcforce',
+    'legendgrouptitle_text': "Tot Fx",
+}
+
+Y_MASSC_FORCE_CONESTYLE = {
+    'legendgroup' : 'ymcforce',
+    'legendgrouptitle_text': "Tot Fy",
+    'anchor':'tip' ,
+    "colorscale": [[0, "green"], [1, "green"]],
+    'showscale': False,
+}
+
+
+Y_MASSC_FORCE_LINESTYLE = {
+    'line': {'color': 'green', 'width':2},
+    'legendgroup' : 'ymcforce',
+    'legendgrouptitle_text': "Tot Fy",
+}
+
+
+X_FORCE_CONESTYLE = {
+    'legendgroup' : 'xforce',
+    'legendgrouptitle_text': "Global Fx",
+    'anchor':'tip' ,
+    "colorscale": [[0, "red"], [1, "red"]],
+    'showscale': False,
+}
+
+
+X_FORCE_LINESTYLE = {
+    'line': {'color': 'red', 'width':2},
+    'legendgroup' : 'xforce',
+    'legendgrouptitle_text': "Global Fx",
+}
+
+
+Y_FORCE_CONESTYLE = {
+    'legendgroup' : 'yforce',
+    'legendgrouptitle_text': "Global Fy",
+    'anchor':'tip' ,
+    "colorscale": [[0, "red"], [1, "red"]],
+    'showscale': False,
+}
+
+
+Y_FORCE_LINESTYLE = {
+    'line': {'color': 'red', 'width':2},
+    'legendgroup' : 'yforce',
+    'legendgrouptitle_text': "Global Fy",
+}
+
+Z_FORCE_CONESTYLE = {
+    'legendgroup' : 'zforce',
+    'legendgrouptitle_text': "Global Fz",
+    'anchor':'tip' ,
+    "colorscale": [[0, "red"], [1, "red"]],
+    'showscale': False,
+}
+
+
+Z_FORCE_LINESTYLE = {
+    'line': {'color': 'red', 'width':2},
+    'legendgroup' : 'zforce',
+    'legendgrouptitle_text': "Global Fz",
+}
+
 
 X_SHEAR_STYLE = {
     'line': {'color': 'orange'},
@@ -43,7 +127,7 @@ POLY_STYLE = {
 Y_MOMENT_STYLE = {
     'line': {'color': 'orange'},
     'legendgroup' : 'ymoment',
-    'legendgrouptitle_text': "Global My"
+    'legendgrouptitle_text': "Global My",
 }
 
 X_MOMENT_STYLE = {
@@ -68,6 +152,11 @@ DEFAULT_FACE_STYLE = {
 }
 
 
+HOVERTEMPL_X_FORCE = '<br>Fx: %{customdata[0]:.2f}'
+HOVERTEMPL_X_MASSC_FORCE = '<br>tot Fx: %{customdata[0]:.2f}'
+HOVERTEMPL_Y_FORCE = '<br>Fy: %{customdata[0]:.2f}'
+HOVERTEMPL_Y_MASSC_FORCE = '<br>tot Fy: %{customdata[0]:.2f}'
+HOVERTEMPL_Z_FORCE = '<br>Fz: %{customdata[0]:.2f}'
 HOVERTEMPL_X_SHEAR = '<br>Vx: %{customdata[4]:.2f}'
 HOVERTEMPL_Y_SHEAR = '<br>Vy: %{customdata[5]:.2f}'
 HOVERTEMPL_Y_MOMENT = '<br>My: %{customdata[6]:.2f}'
@@ -84,7 +173,14 @@ HOVERTEMPL_XYZ_BEAM = (
 
 def init_go():
     fig = go.Figure()
-    fig.update_layout(template='simple_white')
+    fig.update_layout(template=PLOTLY_TEMPLATE)
+    fig.update_layout(
+    scene=dict(
+        xaxis=dict(showspikes=False),
+        yaxis=dict(showspikes=False),
+        zaxis=dict(showspikes=False)
+    )
+    )
     return fig
 
 
@@ -336,6 +432,237 @@ def to_go_polygons(fig:go.Figure, polygons:Polygons, z:float=0.0) -> go.Figure:
         to_go_polygon(fig, neg_poly, z=z, name='neg poly')
 
     return fig
+
+
+def to_go_3dLine(
+        fig:go.Figure,
+        x:pd.Series,
+        y:pd.Series,
+        z:pd.Series,
+        name:str='',
+        hovertempl:str|None=None,
+        customdata:np.ndarray|None=None,
+        kwargs:dict={}
+        ) -> go.Figure:
+    
+    fig.add_trace(
+        go.Scatter3d(
+            x=x,
+            y=y,
+            z=z,
+            mode='lines',
+            name=name,
+            hovertemplate=hovertempl,
+            customdata=customdata,
+            **kwargs
+        )
+    )
+
+    return fig
+
+
+def to_go_arrows(
+        fig:go.Figure,
+        x_tips:np.ndarray,
+        y_tips:np.ndarray,
+        z_tips:np.ndarray,
+        dx:np.ndarray,
+        dy:np.ndarray,
+        dz:np.ndarray,
+        customdata:np.ndarray,
+        hovertempl:str = '',
+        conekwargs:dict={},
+        shaftkwargs:dict={},
+        name:str=''
+    ) -> go.Figure:
+
+    for x, y, z, d_x, d_y, d_z, data in zip(x_tips, y_tips, z_tips, dx, dy, dz, customdata):
+
+        fig = to_go_3dLine(
+            fig=fig,
+            x=pd.Series([x - d_x, x]),
+            y=pd.Series([y - d_y, y]),
+            z=pd.Series([z - d_z, z]),
+            customdata=np.array([[data], [data]]),
+            hovertempl=hovertempl,
+            kwargs=shaftkwargs,
+            name=name
+        )
+        
+        tip_dir = np.array([d_x, d_y, d_z])
+        norm = np.linalg.norm(tip_dir)
+
+        
+        if norm >= FORCE_CONELENGTH:
+            tx, ty, tz = tip_dir / norm * FORCE_CONELENGTH
+
+            fig.add_trace(
+                go.Cone(
+                    x=[x],
+                    y=[y],
+                    z=[z],
+                    u=[tx],
+                    v=[ty],
+                    w=[tz],
+                    **conekwargs
+                )
+            )
+
+    return fig
+
+
+def to_go_x_force(
+        fig:go.Figure,
+        beam:ZBeamElement,
+        scale:float=1.0,
+        ) -> go.Figure:
+    
+    z = beam._z_space
+    x = np.full_like(z, beam._node._glo_x)
+    y = np.full_like(z, beam._node._glo_y)
+    dy = np.full_like(z, 0)
+    dz = np.full_like(z, 0)
+
+    to_go_arrows(
+        fig=fig,
+        x_tips=x,
+        y_tips=y,
+        z_tips=z,
+        dx=beam._f_x_vec * scale,
+        dy=dy,
+        dz=dz,
+        customdata=beam._f_x_vec,
+        hovertempl=HOVERTEMPL_X_FORCE,
+        conekwargs=X_FORCE_CONESTYLE,
+        shaftkwargs=X_FORCE_LINESTYLE,
+        name=f'glo Fx {beam._no}'
+    )
+
+    return fig
+
+
+def to_go_y_force(
+        fig:go.Figure,
+        beam:ZBeamElement,
+        scale:float=1.0,
+        ) -> go.Figure:
+    
+    z = beam._z_space
+    x = np.full_like(z, beam._node._glo_x)
+    y = np.full_like(z, beam._node._glo_y)
+    dx = np.full_like(z, 0)
+    dz = np.full_like(z, 0)
+
+    to_go_arrows(
+        fig=fig,
+        x_tips=x,
+        y_tips=y,
+        z_tips=z,
+        dx=dx,
+        dy=beam._f_y_vec * scale,
+        dz=dz,
+        customdata=beam._f_y_vec,
+        hovertempl=HOVERTEMPL_Y_FORCE,
+        conekwargs=Y_FORCE_CONESTYLE,
+        shaftkwargs=Y_FORCE_LINESTYLE,
+        name=f'glo Fy {beam._no}'
+    )
+
+    return fig
+
+
+def to_go_z_force(
+        fig:go.Figure,
+        beam:ZBeamElement,
+        scale:float=1.0,
+        ) -> go.Figure:
+    
+    z = beam._z_space
+    x = np.full_like(z, beam._node._glo_x)
+    y = np.full_like(z, beam._node._glo_y)
+    dx = np.full_like(z, 0)
+    dy = np.full_like(z, 0)
+
+    to_go_arrows(
+        fig=fig,
+        x_tips=x,
+        y_tips=y,
+        z_tips=z,
+        dx=dx,
+        dy=dy,
+        dz=beam._f_z_vec * scale,
+        customdata=beam._f_z_vec,
+        hovertempl=HOVERTEMPL_Z_FORCE,
+        conekwargs=Z_FORCE_CONESTYLE,
+        shaftkwargs=Z_FORCE_LINESTYLE,
+        name=f'glo Fz {beam._no}'
+    )
+
+    return fig
+
+
+def to_go_massc_x_force(
+        fig:go.Figure,
+        glo_x:np.ndarray,
+        glo_y:np.ndarray,
+        glo_z:np.ndarray,
+        f_x_vec:np.ndarray,
+        scale:float=1.0,
+        ) -> go.Figure:
+    
+    dx = f_x_vec * scale
+    dy = np.full_like(glo_z, 0)
+    dz = np.full_like(glo_z, 0)
+
+    to_go_arrows(
+        fig=fig,
+        x_tips=glo_x,
+        y_tips=glo_y,
+        z_tips=glo_z,
+        dx=dx,
+        dy=dy,
+        dz=dz,
+        customdata=f_x_vec,
+        hovertempl=HOVERTEMPL_X_MASSC_FORCE,
+        conekwargs=X_MASSC_FORCE_CONESTYLE,
+        shaftkwargs=X_MASSC_FORCE_LINESTYLE,
+        name=f'tot Fy'
+    )
+
+    return fig
+
+
+def to_go_massc_y_force(
+        fig:go.Figure,
+        glo_x:np.ndarray,
+        glo_y:np.ndarray,
+        glo_z:np.ndarray,
+        f_y_vec:np.ndarray,
+        scale:float=1.0,
+        ) -> go.Figure:
+    
+    dx = np.full_like(glo_z, 0)
+    dy = f_y_vec * scale
+    dz = np.full_like(glo_z, 0)
+
+    to_go_arrows(
+        fig=fig,
+        x_tips=glo_x,
+        y_tips=glo_y,
+        z_tips=glo_z,
+        dx=dx,
+        dy=dy,
+        dz=dz,
+        customdata=f_y_vec,
+        hovertempl=HOVERTEMPL_Y_MASSC_FORCE,
+        conekwargs=Y_MASSC_FORCE_CONESTYLE,
+        shaftkwargs=Y_MASSC_FORCE_LINESTYLE,
+        name=f'tot Fy'
+    )
+
+    return fig
+
+
 
 
 def write_html(fig:go.Figure, **kwargs) -> None:
