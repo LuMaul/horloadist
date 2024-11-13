@@ -8,6 +8,7 @@ from horloadist.loads import Load
 from horloadist.polygon import Polygon, Polygons
 
 import horloadist.converters.to_plotly as plotly_conv
+import horloadist.converters.io_rfem as rfem_conv
 
 
 class ZLinSolve:
@@ -246,3 +247,48 @@ class ZLinSolve:
 
 
         plotly_conv.write_html(fig, **kwargs)
+
+
+    def to_rfem(
+            self,
+            polygon:Polygon|Polygons,
+            zload:float|None=None,
+            **rfem_model_kwargs
+            ) -> None:
+
+        rfem_conv.init_rfem_model(**rfem_model_kwargs)
+
+        rfem_conv.Model.clientModel.service.begin_modification()
+
+
+
+        loadcase_no = rfem_conv._get_max_obj_nr(rfem_conv.ObjectTypes.E_OBJECT_TYPE_LOAD_CASE)
+
+        for z, f_x, f_y in zip(self._z_space, self._f_x_vec, self._f_y_vec):
+            if z != 0:
+                if isinstance(polygon, Polygon):
+                    shell_tag = rfem_conv.to_rfem_shell(polygon, z=z)
+                
+                if isinstance(polygon, Polygons):
+                    shell_tag = rfem_conv.to_rfem_shell(polygon._pos_polygon, z=z)
+                    for neg_polygon in polygon._neg_polygons:
+                        rfem_conv.to_rfem_opening(neg_polygon, z=z)
+                
+                glo_x, glo_y = polygon.centroid
+                load = Load(f_x, f_y)
+                rfem_conv.to_rfem_free_load(
+                    glo_x,
+                    glo_y,
+                    shell_tag,
+                    load,
+                    z_load=zload,
+                    explicit_loadcase_no=loadcase_no
+                    )
+                
+        for beam in self.pseudo_beams:
+            rfem_conv.to_rfem_wall_pillar(beam)
+
+        rfem_conv.Model.clientModel.service.finish_modification()
+
+
+        pass

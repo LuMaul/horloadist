@@ -70,15 +70,15 @@ sol = LinSolve(xy_structure=struc, xy_load=loadcase_x)
 
 sol.printTable()
 
-# sol.to_mpl(tot_polygon, fname='example_to_mpl', show=False, save=True, fformat='png')
+# # sol.to_mpl(tot_polygon, fname='example_to_mpl', show=False, save=True, fformat='png')
 
 
-# analyzing it pseudo vertical
-import pickle
-import os
+# # analyzing it pseudo vertical
+# import pickle
+# import os
 
-with open(os.path.join('example_vload_from_rfem','THESIS_main.pkl'), 'rb') as file:
-    vert_sol:LinSolve = pickle.load(file)
+# with open(os.path.join('example_vload_from_rfem','THESIS_main.pkl'), 'rb') as file:
+#     vert_sol:LinSolve = pickle.load(file)
 
 
 z_space = loadvec.z_linspace(z_num_floors=10, floor_heigt=2.50)
@@ -96,22 +96,24 @@ f_x_vec = loadvec.weighted_norm_g_by_polygon(
 f_y_vec = loadvec.uniform(z_space=z_space, const_force=0.0)
 
 zsol = ZLinSolve(
-    linsolve=vert_sol,
+    linsolve=sol,
     z_space=z_space,
     f_x_vec=f_x_vec,
     f_y_vec=f_y_vec
 )
 
-zsol.to_plotly(
-    tot_fx_scale=10e-4,
-    tot_fy_scale=10e-4,
-    fx_scale=10e-4,
-    fy_scale=10e-4,
-    fz_scale=10e-2/2,
-    vx_scale=10e-4,
-    vy_scale=10e-4,
-    vz_scale=10e-2/2,
-    mx_scale=10e-4/3,
-    my_scale=10e-4/3,
-    polygon=tot_polygon
-    )
+zsol.to_rfem(tot_polygon, zload=1.0)
+
+# zsol.to_plotly(
+#     tot_fx_scale=10e-4,
+#     tot_fy_scale=10e-4,
+#     fx_scale=10e-4,
+#     fy_scale=10e-4,
+#     fz_scale=10e-2/2,
+#     vx_scale=10e-4,
+#     vy_scale=10e-4,
+#     vz_scale=10e-2/2,
+#     mx_scale=10e-4/3,
+#     my_scale=10e-4/3,
+#     polygon=tot_polygon
+#     )
