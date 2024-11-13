@@ -217,33 +217,6 @@ def _fill_between(
 
 
 
-def to_go_3dLine(
-        fig:go.Figure,
-        x:pd.Series,
-        y:pd.Series,
-        z:pd.Series,
-        name:str='',
-        hovertempl:str|None=None,
-        customdata:np.ndarray|None=None,
-        kwargs:dict={}
-        ) -> go.Figure:
-    
-    fig.add_trace(
-        go.Scatter3d(
-            x=x,
-            y=y,
-            z=z,
-            mode='lines',
-            name=name,
-            hovertemplate=hovertempl,
-            customdata=customdata,
-            **kwargs
-        )
-    )
-
-    return fig
-
-
 def to_go_fill_between(
         fig:go.Figure,
 
